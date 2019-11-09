@@ -7,6 +7,12 @@ const signale = require('signale')
 const constants = require('../shared/constants')
 const {codes} = require('../shared/constants')
 
+process.on('unhandledRejection', err => {
+  const message = `${err.name}/${err.code}: ${err.message}`
+  signale.fatal(message)
+  process.exit(1)
+})
+
 const processArgs = {}
 
 processArgs.build = async buildArg => {
@@ -58,12 +64,30 @@ const detectSite = async siteArg => {
   }
 }
 
+const buildExit = {}
+
+buildExit.error = err => {
+  throw errors.buildError(`build process exited with non-zero status.\n\n${err.message}`, codes.LR_004)
+}
+
+buildExit.success = () => {
+  throw errors.buildExit(`build succeed but exited; live-reload builds should watch for file-changes persistantly`, codes.LR_004)
+}
+
+/**
+ *
+ * @param {Object} pids
+ * @param {string} buildArg
+ */
 const launchBuild = (pids, buildArg) => {
+  const build = execa.command(buildArg)
+    .then(buildExit.success)
+    .catch(buildExit.error)
 
-  pids.build = execa.command(buildArg)
+  pids.build = build
 
-  pids.build.stdout.pipe(process.stdout)
-  pids.build.stderr.pipe(process.stderr)
+//  pids.build.stdout.pipe(process.stdout)
+//  pids.build.stderr.pipe(process.stderr)
 }
 
 const attachSignalHandlers = pids => {
@@ -106,7 +130,7 @@ const callApplication = async rawArgs => {
     site: rawArgs['--site']
   }
 
-  liveReload(args)
+  await liveReload(args)
 }
 
 module.exports = callApplication
