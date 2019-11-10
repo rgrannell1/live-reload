@@ -5,6 +5,9 @@ const fs = require('fs')
 const fsp = require('fs').promises
 const errors = require('@rgrannell/errors')
 const signale = require('signale')
+const express = require('express')
+const processHtml = require('./process-html')
+
 const constants = require('../shared/constants')
 const {codes} = require('../shared/constants')
 const errUtils = require('../shared/errors')
@@ -115,7 +118,6 @@ const readSite = async (fpath, state, warn = true) => {
 
   try {
     var content = await fsp.readFile(fpath)
-    signale.info(`loaded site ${fpath} v${version}`)
     state.version++
 
   } catch (err) {
@@ -143,7 +145,7 @@ const readSite = async (fpath, state, warn = true) => {
   }
 
   return {
-    content: content.toString(),
+    content: processHtml(fpath, content.toString(), state),
     fpath,
     ctime: stat.ctimeMs,
     mtime: stat.mtimeMs
@@ -168,19 +170,31 @@ const readSiteData = async (siteArg, state, defaults) => {
 
 }
 
-const launchSite = async (pids, siteArg) => {
-  // does the site exist?
-  // hash
-  // edit and launch
-
-  const state = {
-    version: 1
+const serveIndex = state => (req, res) => {
+  if (state && state.siteData && state.siteData.content && state.siteData.content.source) {
+    res.send(state.siteData.content.source)
+  } else {
+    console.log('not loaded')
   }
+}
 
+const launchServer = async state => {
+  const app = express()
+  const port = 4000
+
+  app.get('/', serveIndex(state))
+
+  app.use(express.static('.'))
+
+  app.listen(port, () => {
+    signale.info(`live-reload running http://localhost:${port}`)
+  })
+}
+
+const launchSite = async (pids, state, siteArg) => {
   setInterval(async () => {
     state.siteData = await readSiteData(siteArg, state, constants.sitePaths)
   }, 250)
-
 }
 
 /**
@@ -191,14 +205,17 @@ const launchSite = async (pids, siteArg) => {
 const liveReload = async args => {
   let pids = {}
 
-  //attachSignalHandlers(pids)
+  const state = {
+    version: 0
+  }
 
+  launchServer(state)
   launchBuild(pids, args.build)
-  launchSite(pids, args.site)
+  launchSite(pids, state, args.site)
 }
 
 /**
- * Run the live-reload application
+ * Run the live-reload applications
  *
  * @param {Object} rawArgs arguments provided by the docopt interface
  */

@@ -1,4 +1,6 @@
 
+const path = require('path')
+
 module.exports = {
   codes: {
     LR_001: 'LR_001',
@@ -16,5 +18,8 @@ module.exports = {
     'client/index.html',
     'client/html/index.htm',
     'client/html/index.html'
-  ]
+  ],
+  paths: {
+    liveReload: path.join(__dirname, '../../static/live-reload.js')
+  }
 }
