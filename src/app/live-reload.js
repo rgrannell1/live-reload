@@ -2,19 +2,22 @@
 const path = require('path')
 const execa = require('execa')
 const fs = require('fs')
+const fsp = require('fs').promises
 const errors = require('@rgrannell/errors')
 const signale = require('signale')
 const constants = require('../shared/constants')
 const {codes} = require('../shared/constants')
+const errUtils = require('../shared/errors')
 
-process.on('unhandledRejection', err => {
-  const message = `${err.name}/${err.code}: ${err.message}`
-  signale.fatal(message)
-  process.exit(1)
-})
+process.on('unhandledRejection', errUtils.report)
 
 const processArgs = {}
 
+/**
+ *
+ *
+ * @param {string} buildArg the shell-script to run for a build.
+ */
 processArgs.build = async buildArg => {
   const hasBuildArg = buildArg && buildArg.length > 0
 
@@ -85,23 +88,99 @@ const launchBuild = (pids, buildArg) => {
     .catch(buildExit.error)
 
   pids.build = build
-
-//  pids.build.stdout.pipe(process.stdout)
-//  pids.build.stderr.pipe(process.stderr)
 }
 
-const attachSignalHandlers = pids => {
-  process.on('SIGKILL', () => {
-    subprocess.kill('SIGTERM', {
-      forceKillAfterTimeout: 1 * 1000
-    })
-  })
+const readSite = async (fpath, state, warn = true) => {
+  const cwd = process.cwd()
+  const fullPath = path.join(cwd, fpath)
 
-  process.on('SIGINT', () => {
-    subprocess.kill('SIGTERM', {
-      forceKillAfterTimeout: 4 * 1000
-    })
-  })
+  const { siteData: previous, version} = state
+
+  try {
+    var stat = await fsp.stat(fpath)
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      const thrown = errors.fileNotFound(`${fpath} not found (${cwd})`, codes.LR_005)
+      thrown.warn = true
+
+      throw thrown
+    } else {
+      console.log(err)
+    }
+  }
+
+  if (previous && (previous.ctime === stat.ctimeMs && previous.mtime === stat.mtimeMs)) {
+    return previous
+  }
+
+  try {
+    var content = await fsp.readFile(fpath)
+    signale.info(`loaded site ${fpath} v${version}`)
+    state.version++
+
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      const thrown = errors.fileNotFound(`${fpath} not found (${cwd})`, codes.LR_005)
+      thrown.warn = true
+
+      throw thrown
+    } else {
+      try {
+        var content = await fsp.readFile(fpath)
+      } catch (err) {
+        if (err.code === 'ENOENT') {
+          const thrown = errors.fileNotFound(`${fpath} not found (${cwd})`, codes.LR_005)
+          thrown.warn = true
+
+          throw thrown
+        } else {
+          console.log(err)
+        }
+      }
+
+      console.log(err)
+    }
+  }
+
+  return {
+    content: content.toString(),
+    fpath,
+    ctime: stat.ctimeMs,
+    mtime: stat.mtimeMs
+  }
+}
+
+const readSiteData = async (siteArg, state, defaults) => {
+  if (siteArg) {
+    return readSite(siteArg, state)
+  } else {
+    // todo
+    let result = null
+    for (const fpath of defaults) {
+      try {
+        result = await readSite(fpath)
+        break
+      } catch (err) {
+
+      }
+    }
+  }
+
+}
+
+const launchSite = async (pids, siteArg) => {
+  // does the site exist?
+  // hash
+  // edit and launch
+
+  const state = {
+    version: 1
+  }
+
+  setInterval(async () => {
+    state.siteData = await readSiteData(siteArg, state, constants.sitePaths)
+  }, 250)
+
 }
 
 /**
@@ -112,11 +191,10 @@ const attachSignalHandlers = pids => {
 const liveReload = async args => {
   let pids = {}
 
-//  attachSignalHandlers(pids)
+  //attachSignalHandlers(pids)
 
   launchBuild(pids, args.build)
-
-  // watch
+  launchSite(pids, args.site)
 }
 
 /**

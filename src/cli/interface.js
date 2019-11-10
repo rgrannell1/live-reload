@@ -1,6 +1,7 @@
 
 const {docopt} = require('docopt')
 const signale = require('signale')
+const errUtils = require('../shared/errors')
 
 const doc = `
 Usage:
@@ -16,8 +17,4 @@ Options:
 
 const liveReload = require('../app/live-reload')
 
-liveReload(docopt(doc)).catch(err => {
-  const message = `${err.name}/${err.code}: ${err.message}`
-  signale.fatal(message)
-  process.exit(1)
-})
+liveReload(docopt(doc)).catch(errUtils.report)
