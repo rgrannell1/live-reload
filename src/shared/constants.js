@@ -36,5 +36,8 @@ module.exports = {
     connection: 'connection',
     message: 'message',
     refresh: 'refresh'
+  },
+  intervals: {
+    updateIndexFile: 250
   }
 }

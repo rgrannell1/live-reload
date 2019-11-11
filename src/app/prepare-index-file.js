@@ -45,61 +45,64 @@ const readSite = async ({site, fullPath, publicFolder,state}) => {
   }
 }
 
+const hasSameEditTimes = (stat, previous) => {
+  if (!previous) {
+    return false
+  }
+
+  const hasSameCtime = previous.ctime === stat.ctimeMs
+  const hasSameMtime = previous.mtime === stat.mtimeMs
+
+  return hasSameCtime && hasSameMtime
+}
+
 const readSiteOnChange = async ({site, publicFolder, warn = true, state}) => {
   const fullPath = path.join(publicFolder, site)
 
   const { siteData: previous, version } = state
   const stat = await readSiteStat({fullPath, site, publicFolder})
 
-  if (previous && (previous.ctime === stat.ctimeMs && previous.mtime === stat.mtimeMs)) {
+  if (hasSameEditTimes(stat, previous)) {
     previous.refreshed = false
     return previous
-  }
-
-  const {refreshed, content} = await readSite({
-    site,
-    fullPath,
-    publicFolder,
-    state
-  })
-
-  return {
-    refreshed,
-    content: await processHtml(site, content.toString(), state),
-    fpath: site,
-    ctime: stat.ctimeMs,
-    mtime: stat.mtimeMs
-  }
-}
-
-const readSiteData = async ({site, publicFolder, state}) => {
-  if (site) {
-    return readSiteOnChange({
+  } else {
+    const {refreshed, content} = await readSite({
       site,
+      fullPath,
       publicFolder,
-      warn: true,
       state
     })
-  } else {
-    // -- todo.
+
+    return {
+      refreshed,
+      content: await processHtml(site, content.toString(), state),
+      fpath: site,
+      ctime: stat.ctimeMs,
+      mtime: stat.mtimeMs
+    }
   }
 }
 
 const prepareIndexFile = ({state, site, publicFolder}) => {
   const emitter = new EventEmitter()
 
+  const {events} = constants
+
   setInterval(async () => {
-    state.siteData = await readSiteData({
+    const siteData = await readSiteOnChange({
       site,
       publicFolder,
-      state
+      state,
+      warn: true
     })
 
-    if (state.siteData.refreshed) {
-      emitter.emit('refresh', state.siteData)
-      state.siteData.refreshed = false
+    if (siteData.refreshed) {
+      emitter.emit(events.refresh, siteData)
+      siteData.refreshed = false
     }
-  }, 250)
+
+    state.siteData = siteData
+  }, constants.intervals.updateIndexFile)
 
   return emitter
 }
