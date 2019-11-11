@@ -13,6 +13,12 @@ const readEvent = data => {
   }
 }
 
+/**
+ * Launch a websocket-server
+ *
+ * @param {Object} state the state object
+ * @param {number} port the websocket port
+ */
 const launchWsServer = async (state, port) => {
   const wss = new WebSocket.Server({ port })
 

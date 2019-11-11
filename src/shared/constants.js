@@ -28,5 +28,12 @@ module.exports = {
   ports: {
     wss: 4001,
     http: 4000
+  },
+  tags: {
+    refresh: 'refresh'
+  },
+  events: {
+    connection: 'connection',
+    message: 'message'
   }
 }

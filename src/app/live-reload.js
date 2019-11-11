@@ -32,6 +32,8 @@ buildExit.success = () => {
  * @param {string} buildArg
  */
 const launchBuild = (pids, buildArg) => {
+  // -- builds are continuous so we can't block with 'await'
+  // -- promise rejections will be unhandled though
   const build = execa.command(buildArg)
     .then(buildExit.success)
     .catch(buildExit.error)
@@ -57,13 +59,17 @@ const liveReload = async args => {
 
   const wss = await launchWsServer(state, args.ports.wss)
 
-  wss.on('connection', ws => {
+  const asEvent = data => JSON.stringify(data)
+
+  wss.on(constants.events.connection, ws => {
     contentChange.on('refresh', () => {
-      ws.send('message', 'refresh')
+      ws.send(asEvent({
+        tag: constants.tags.refresh
+      }))
     })
   })
 
-  wss.on('message', event => {
+  wss.on(constants.events.message, event => {
     signale.info(`${event.version} is running in browser`)
   })
 }

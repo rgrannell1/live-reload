@@ -6,6 +6,14 @@ const {codes} = require('../shared/constants')
 
 const processArgs = {}
 
+/**
+ * Process and validate port arguments supplied.
+ *
+ * @param {string} port0Arg the first port argument
+ * @param {string} port1Arg the second port argument
+ *
+ * @returns {number} the first port argument, processed
+ */
 processArgs.port = (port0Arg, port1Arg) => {
   const port0 = parseInt(port0Arg, 10)
   const port1 = parseInt(port1Arg, 10)
@@ -29,9 +37,11 @@ processArgs.port = (port0Arg, port1Arg) => {
 }
 
 /**
- *
+ * process the build argument supplied to live-reload
  *
  * @param {string} buildArg the shell-script to run for a build.
+ *
+ * @returns {string} the build argument
  */
 processArgs.build = async buildArg => {
   const hasBuildArg = buildArg && buildArg.length > 0
