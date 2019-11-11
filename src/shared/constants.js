@@ -8,6 +8,8 @@ module.exports = {
     LR_003: 'LR_003',
     LR_004: 'LR_004',
     LR_005: 'LR_005',
+    LR_006: 'LR_006',
+    LR_007: 'LR_007',
   },
   sitePaths: [
     'public/index.htm',
@@ -21,5 +23,9 @@ module.exports = {
   ],
   paths: {
     liveReload: path.join(__dirname, '../../static/live-reload.js')
+  },
+  ports: {
+    wss: 4001,
+    http: 4000
   }
 }

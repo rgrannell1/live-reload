@@ -4,10 +4,8 @@ const signale = require('signale')
 const WebSocket = require('ws')
 const EventEmitter = require('events')
 
-const launchWsServer = async state => {
-  const wss = new WebSocket.Server({
-    port: 4001
-  })
+const launchWsServer = async (state, port) => {
+  const wss = new WebSocket.Server({ port })
 
   const emitter = new EventEmitter()
 
