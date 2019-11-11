@@ -2,12 +2,18 @@
 const errors = require('@rgrannell/errors')
 const cheerio = require('cheerio')
 const signale = require('signale')
-const fsp = require('fs').promises
+const moment = require('moment')
+const fs = require('fs')
 
 const constants = require('../shared/constants')
 
 const processHtml = async (fpath, html, state) => {
-  const code = await fsp.readFile(constants.paths.liveReload)
+  const code = await new Promise((resolve, reject) => {
+    fs.readFile(constants.paths.liveReload, (err, res) => {
+      err ? reject(err) : resolve(res)
+    })
+  })
+
 
   try {
     const $ = cheerio.load(html)
@@ -15,7 +21,8 @@ const processHtml = async (fpath, html, state) => {
 
     $('head').append($script)
 
-    signale.info(`loaded site ${fpath} v${state.version}`)
+    const time = moment().format('hh:mm:ss')
+    signale.info(`loaded site ${fpath} v${state.version} at ${time}`)
 
     return {
       source: $.html()

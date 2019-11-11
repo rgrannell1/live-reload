@@ -2,19 +2,39 @@
 const path = require('path')
 const execa = require('execa')
 const fs = require('fs')
-const fsp = require('fs').promises
 const errors = require('@rgrannell/errors')
 const signale = require('signale')
 const express = require('express')
 const WebSocket = require('ws')
+const EventEmitter = require('events')
 
 const processHtml = require('./process-html')
+
+const launchStaticServer = require('./launch-static-server')
 
 const constants = require('../shared/constants')
 const {codes} = require('../shared/constants')
 const errUtils = require('../shared/errors')
 
 process.on('unhandledRejection', errUtils.report)
+
+const fsp = {}
+
+fsp.readFile = fpath => {
+  return new Promise((resolve, reject) => {
+    fs.readFile(fpath, (err, content) => {
+      err ? reject(err) : resolve(content)
+    })
+  })
+}
+
+fsp.stat = fpath => {
+  return new Promise((resolve, reject) => {
+    fs.stat(fpath, (err, stats) => {
+      err ? reject(err) : resolve(stats)
+    })
+  })
+}
 
 const processArgs = {}
 
@@ -115,12 +135,16 @@ const readSite = async (fpath, state, warn = true) => {
   }
 
   if (previous && (previous.ctime === stat.ctimeMs && previous.mtime === stat.mtimeMs)) {
+    previous.refreshed = false
     return previous
   }
+
+  let refreshed = false
 
   try {
     var content = await fsp.readFile(fpath)
     state.version++
+    refreshed = true
 
   } catch (err) {
     if (err.code === 'ENOENT') {
@@ -147,6 +171,7 @@ const readSite = async (fpath, state, warn = true) => {
   }
 
   return {
+    refreshed,
     content: await processHtml(fpath, content.toString(), state),
     fpath,
     ctime: stat.ctimeMs,
@@ -172,47 +197,40 @@ const readSiteData = async (siteArg, state, defaults) => {
 
 }
 
-const serveIndex = state => (req, res) => {
-  if (state && state.siteData && state.siteData.content && state.siteData.content.source) {
-    res.send(state.siteData.content.source)
-  } else {
-    console.log(state)
-  }
-}
-
 const launchWsServer = async state => {
   const wss = new WebSocket.Server({
     port: 4001
   })
 
+  const emitter = new EventEmitter()
+
   wss.on('connection', ws => {
-    ws.on('message', message => {
-      console.log('foop.')
+    ws.on('message', event => {
+      emitter.emit('message', event)
     })
 
-    ws.send('something')
-  })
-}
+    emitter.emit('connection', ws)
 
-const launchStaticServer = async state => {
-  const app = express()
-  const port = 4000
-
-  app.get('/', serveIndex(state))
-
-  app.use(express.static('.'))
-
-  app.listen(port, () => {
-    signale.info(`live-reload running http://localhost:${port}`)
+    signale.info('websocket server established')
   })
 
-
+  return emitter
 }
 
-const launchSite = async (pids, state, siteArg) => {
+
+const launchSite = (pids, state, siteArg) => {
+  const emitter = new EventEmitter()
+
   setInterval(async () => {
     state.siteData = await readSiteData(siteArg, state, constants.sitePaths)
+
+    if (state.siteData.refreshed) {
+      emitter.emit('refresh', state.siteData)
+      state.siteData.refreshed = false
+    }
   }, 250)
+
+  return emitter
 }
 
 /**
@@ -227,10 +245,23 @@ const liveReload = async args => {
     version: 0
   }
 
-  launchWsServer(state)
-  launchStaticServer(state)
+  const ports = {
+    http: 4000
+  }
+
+  const wss = await launchWsServer(state)
+
+
+  launchStaticServer(state, ports.http)
   launchBuild(pids, args.build)
-  launchSite(pids, state, args.site)
+  const contentEmitter = launchSite(pids, state, args.site)
+
+  wss.on('connection', ws => {
+    contentEmitter.on('refresh', () => {
+      ws.send('message', 'refresh')
+    })
+  })
+
 }
 
 /**
