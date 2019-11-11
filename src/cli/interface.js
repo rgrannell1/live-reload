@@ -18,11 +18,13 @@ Description:
 
 Options:
   --build=<command>         a shell command.
+  --hide-build-stderr       should the build's stderr be hidden?
+  --hide-build-stdout       should the build's stdout be hidden?
   --http_port=<port>        the static-server port [default: ${constants.ports.http}].
   --public_folder=<path>    the root of the public folder for your static-site. Mandatory.
   --site=<path>             the site to load, relative to the public folder. Mandatory.
   --wss_port=<port>         the websocket-server port [default: ${constants.ports.wss}].
-  `
+`
 
 const liveReload = require('../app/live-reload')
 

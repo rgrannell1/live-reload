@@ -44,7 +44,7 @@ buildExit.success = () => {
  * @param {Object} pids
  * @param {string} buildArg
  */
-const launchBuild = (pids, buildArg) => {
+const launchBuild = (pids, hide, buildArg) => {
   // -- builds are continuous so we can't block with 'await'
   // -- promise rejections will be unhandled though
   const build = execa.command(buildArg)
@@ -67,7 +67,7 @@ const liveReload = async args => {
   }
 
   launchStaticServer(state, args.ports.http)
-  launchBuild(pids, args.build)
+  launchBuild(pids, args.hide, args.build)
 
   const contentChange = prepareIndexFile({
     pids,
@@ -106,6 +106,10 @@ const callApplication = async rawArgs => {
     ports: {
       http: processArgs.port(rawArgs['--http_port'], rawArgs['--wss_port']),
       wss: processArgs.port(rawArgs['--wss_port'], rawArgs['--http_port'])
+    },
+    hide: {
+      stdout: rawArgs['hide-build-stdout'],
+      stderr: rawArgs['hide-build-stderr']
     }
   }
 
