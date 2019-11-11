@@ -45,6 +45,12 @@ const readSite = async ({site, fullPath, publicFolder,state}) => {
   }
 }
 
+/**
+ * Was the index file edited?
+ *
+ * @param {Object} stat stats for the index file
+ * @param {Object | undefined} previous stats for the previously loaded file
+ */
 const hasSameEditTimes = (stat, previous) => {
   if (!previous) {
     return false
@@ -56,7 +62,7 @@ const hasSameEditTimes = (stat, previous) => {
   return hasSameCtime && hasSameMtime
 }
 
-const readSiteOnChange = async ({site, publicFolder, warn = true, state}) => {
+const readSiteOnChange = async ({site, publicFolder, state}) => {
   const fullPath = path.join(publicFolder, site)
 
   const { siteData: previous, version } = state
@@ -92,8 +98,7 @@ const prepareIndexFile = ({state, site, publicFolder}) => {
     const siteData = await readSiteOnChange({
       site,
       publicFolder,
-      state,
-      warn: true
+      state
     })
 
     if (siteData.refreshed) {
