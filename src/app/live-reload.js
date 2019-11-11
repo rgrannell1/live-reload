@@ -9,7 +9,7 @@ const launchWsServer = require('./launch-ws-server')
 const prepareIndexFile = require('./prepare-index-file')
 
 const constants = require('../shared/constants')
-const {codes} = require('../shared/constants')
+const { codes } = require('../shared/constants')
 const errUtils = require('../shared/errors')
 const processArgs = require('../cli/process-args')
 
@@ -22,7 +22,7 @@ buildExit.error = err => {
 }
 
 buildExit.success = () => {
-  throw errors.buildExit(`build succeed but exited; live-reload builds should watch for file-changes persistantly`, codes.LR_004)
+  throw errors.buildExit('build succeed but exited; live-reload builds should watch for file-changes persistantly', codes.LR_004)
 }
 
 /**
@@ -38,14 +38,13 @@ const launchBuild = (pids, buildArg) => {
   pids.build = build
 }
 
-
 /**
  * Run live-reload with processed arguments.
  *
  * @param {Object} args arguments supplied to live-reload after processing.
  */
 const liveReload = async args => {
-  let pids = {}
+  const pids = {}
 
   const state = {
     version: 0

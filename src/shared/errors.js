@@ -9,7 +9,7 @@ const report = err => {
     const message = `${err.name}/${err.code}: ${err.message}`
     signale.warn(message)
   } else {
-   const message = `${err.name}/${err.code}: ${err.message}`
+    const message = `${err.name}/${err.code}: ${err.message}`
     signale.fatal(message)
     process.exit(1)
   }

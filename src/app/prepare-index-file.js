@@ -36,7 +36,6 @@ const readSite = async (fpath, state, warn = true) => {
     var content = await fsp.readFile(fullPath)
     state.version++
     refreshed = true
-
   } catch (err) {
     if (err.code === 'ENOENT') {
       const thrown = errors.fileNotFound(`${fpath} not found (${cwd})`, codes.LR_005)

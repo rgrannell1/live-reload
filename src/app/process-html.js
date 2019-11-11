@@ -14,7 +14,6 @@ const processHtml = async (fpath, html, state) => {
     })
   })
 
-
   try {
     const $ = cheerio.load(html)
     const $script = $(`<script>${code}</script>`)
