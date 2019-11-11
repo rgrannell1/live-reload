@@ -10,7 +10,7 @@ module.exports = {
     LR_005: 'LR_005',
     LR_006: 'LR_006',
     LR_007: 'LR_007',
-    LR_008: 'LR_008',
+    LR_008: 'LR_008'
   },
   sitePaths: [
     'public/index.htm',

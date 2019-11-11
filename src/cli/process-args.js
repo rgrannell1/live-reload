@@ -1,8 +1,9 @@
 
+const fs = require('fs')
 const path = require('path')
 const errors = require('@rgrannell/errors')
 const constants = require('../shared/constants')
-const {codes} = require('../shared/constants')
+const { codes } = require('../shared/constants')
 
 const processArgs = {}
 
@@ -27,7 +28,6 @@ processArgs.port = (port0Arg, port1Arg) => {
       throw errors.invalidPort(`port ${port} out of allowed range`, constants.codes.LR_007)
     }
   }
-
 
   if (port0 === port1) {
     throw errors.identicalPorts('http and wss ports cannot be the same', constants.codes.LR_007)
@@ -60,17 +60,17 @@ processArgs.build = async buildArg => {
     throw errors.buildMissing('no build command provided, and no "package.json" file found in current directory', codes.LR_001)
   }
 
-  const package = require(packagePath)
+  const pkg = require(packagePath)
 
-  if (!package.hasOwnProperty('scripts')) {
+  if (!pkg.hasOwnProperty('scripts')) {
     throw errors.buildMissing('no build command provided, and "package.json" in current directory has no scripts section', codes.LR_002)
   }
 
-  if (!package.scripts.hasOwnProperty('build')) {
+  if (!pkg.scripts.hasOwnProperty('build')) {
     throw errors.buildMissing('no build command provided, and "package.json" in current directory has no build script', codes.LR_003)
   }
 
-  return package.scripts.build
+  return pkg.scripts.build
 }
 
 processArgs.site = siteArg => {

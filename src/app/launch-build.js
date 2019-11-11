@@ -1,9 +1,10 @@
 
-const execa = require('execa')
 const chalk = require('chalk')
 const cp = require('child_process')
 const stripAnsi = require('strip-ansi')
 const errors = require('@rgrannell/errors')
+const constants = require('../shared/constants')
+const { codes } = constants
 
 const buildExit = {}
 
@@ -24,7 +25,7 @@ buildExit.success = () => {
 }
 
 /**
- * Launch a build via execa
+ * Launch a build
  *
  * @param {Object} pids
  * @param {string} buildArg

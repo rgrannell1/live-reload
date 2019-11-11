@@ -1,10 +1,12 @@
 
 const path = require('path')
 const EventEmitter = require('events')
+const errors = require('@rgrannell/errors')
 
 const fsp = require('../shared/fsp')
 const processHtml = require('./process-html')
 const constants = require('../shared/constants')
+const { codes } = constants
 
 const readSiteStat = ({ fullPath, site, publicFolder }) => {
   try {
@@ -21,7 +23,7 @@ const readSiteStat = ({ fullPath, site, publicFolder }) => {
   }
 }
 
-const readSite = async ({site, fullPath, publicFolder,state}) => {
+const readSite = async ({ site, fullPath, publicFolder, state }) => {
   let refreshed = false
 
   try {
@@ -62,17 +64,17 @@ const hasSameEditTimes = (stat, previous) => {
   return hasSameCtime && hasSameMtime
 }
 
-const readSiteOnChange = async ({site, publicFolder, state}) => {
+const readSiteOnChange = async ({ site, publicFolder, state }) => {
   const fullPath = path.join(publicFolder, site)
 
-  const { siteData: previous, version } = state
-  const stat = await readSiteStat({fullPath, site, publicFolder})
+  const { siteData: previous } = state
+  const stat = await readSiteStat({ fullPath, site, publicFolder })
 
   if (hasSameEditTimes(stat, previous)) {
     previous.refreshed = false
     return previous
   } else {
-    const {refreshed, content} = await readSite({
+    const { refreshed, content } = await readSite({
       site,
       fullPath,
       publicFolder,
@@ -90,10 +92,10 @@ const readSiteOnChange = async ({site, publicFolder, state}) => {
   }
 }
 
-const prepareIndexFile = ({state, site, publicFolder}) => {
+const prepareIndexFile = ({ state, site, publicFolder }) => {
   const emitter = new EventEmitter()
 
-  const {events} = constants
+  const { events } = constants
 
   setInterval(async () => {
     const siteData = await readSiteOnChange({

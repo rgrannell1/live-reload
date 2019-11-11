@@ -1,5 +1,4 @@
 
-const signale = require('signale')
 const errors = require('@rgrannell/errors')
 const constants = require('../shared/constants')
 
@@ -25,7 +24,7 @@ const launchWsServer = async (state, port) => {
 
   const emitter = new EventEmitter()
 
-  const {events} = constants
+  const { events } = constants
 
   wss.on(events.connection, ws => {
     ws.on(events.message, event => {

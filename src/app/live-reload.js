@@ -1,20 +1,15 @@
 
-const path = require('path')
-const execa = require('execa')
-const errors = require('@rgrannell/errors')
-const express = require('express')
 const signale = require('signale')
 
 const launch = {
   staticServer: require('./launch-static-server'),
   wsServer: require('./launch-ws-server'),
-  build: require('./launch-build'),
+  build: require('./launch-build')
 }
 
 const prepareIndexFile = require('./prepare-index-file')
 
 const constants = require('../shared/constants')
-const { codes } = require('../shared/constants')
 const errUtils = require('../shared/errors')
 const processArgs = require('../cli/process-args')
 
@@ -23,7 +18,6 @@ const asEvent = data => {
 }
 
 process.on('unhandledRejection', errUtils.report)
-
 
 /**
  * Run live-reload with processed arguments.
@@ -49,7 +43,7 @@ const liveReload = async args => {
 
   const wss = await launch.wsServer(state, args.ports.wss)
 
-  const {events} = constants
+  const { events } = constants
 
   wss.on(events.connection, ws => {
     contentChange.on(events.refresh, () => {

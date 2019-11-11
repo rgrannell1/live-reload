@@ -1,17 +1,16 @@
 #!/usr/bin/env node
 
-const {docopt} = require('docopt')
-const signale = require('signale')
+const { docopt } = require('docopt')
 const errUtils = require('../shared/errors')
 const constants = require('../shared/constants')
-const package = require('../../package.json')
+const pkg = require('../../package.json')
 
 const doc = `
 Usage:
   live-reload [--build=<command>] (--site=<path>) (--public_folder=<path>) [--hide-build-stdout] [--hide-build-stderr] [--http_port=<port>] [--wss_port=<port>]
 
 Author:
-  ${package.author}
+  ${pkg.author}
 
 Description:
   live-reload is a build-frameworld agnostic method of live-reloading a website when changes are made.
