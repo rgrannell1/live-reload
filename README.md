@@ -1,3 +1,3 @@
 # live-reload
 
-[](example.png)
+![example image](example.png)
