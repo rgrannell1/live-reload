@@ -34,6 +34,7 @@ module.exports = {
   },
   events: {
     connection: 'connection',
-    message: 'message'
+    message: 'message',
+    refresh: 'refresh'
   }
 }

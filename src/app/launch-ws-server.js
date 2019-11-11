@@ -1,6 +1,7 @@
 
 const signale = require('signale')
 const errors = require('@rgrannell/errors')
+const constants = require('../shared/constants')
 
 const WebSocket = require('ws')
 const EventEmitter = require('events')
@@ -24,12 +25,14 @@ const launchWsServer = async (state, port) => {
 
   const emitter = new EventEmitter()
 
-  wss.on('connection', ws => {
-    ws.on('message', event => {
-      emitter.emit('message', readEvent(event))
+  const {events} = constants
+
+  wss.on(events.connection, ws => {
+    ws.on(events.message, event => {
+      emitter.emit(events.message, readEvent(event))
     })
 
-    emitter.emit('connection', ws)
+    emitter.emit(events.connection, ws)
   })
 
   return emitter

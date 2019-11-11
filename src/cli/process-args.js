@@ -73,4 +73,12 @@ processArgs.build = async buildArg => {
   return package.scripts.build
 }
 
+processArgs.site = siteArg => {
+  return siteArg
+}
+
+processArgs.publicFolder = publicFolderArg => {
+  return path.resolve(publicFolderArg)
+}
+
 module.exports = processArgs

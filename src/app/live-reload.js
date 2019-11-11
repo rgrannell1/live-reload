@@ -14,6 +14,10 @@ const { codes } = require('../shared/constants')
 const errUtils = require('../shared/errors')
 const processArgs = require('../cli/process-args')
 
+const asEvent = data => {
+  return JSON.stringify(data)
+}
+
 process.on('unhandledRejection', errUtils.report)
 
 const buildExit = {}
@@ -64,21 +68,27 @@ const liveReload = async args => {
 
   launchStaticServer(state, args.ports.http)
   launchBuild(pids, args.build)
-  const contentChange = prepareIndexFile(pids, state, args.site)
+
+  const contentChange = prepareIndexFile({
+    pids,
+    state,
+    site: args.site,
+    publicFolder: args.publicFolder
+  })
 
   const wss = await launchWsServer(state, args.ports.wss)
 
-  const asEvent = data => JSON.stringify(data)
+  const {events} = constants
 
-  wss.on(constants.events.connection, ws => {
-    contentChange.on('refresh', () => {
+  wss.on(events.connection, ws => {
+    contentChange.on(events.refresh, () => {
       ws.send(asEvent({
         tag: constants.tags.refresh
       }))
     })
   })
 
-  wss.on(constants.events.message, event => {
+  wss.on(events.message, event => {
     signale.info(`${event.version} is running in browser`)
   })
 }
@@ -91,7 +101,8 @@ const liveReload = async args => {
 const callApplication = async rawArgs => {
   const args = {
     build: await processArgs.build(rawArgs['--build']),
-    site: rawArgs['--site'],
+    site: processArgs.site(rawArgs['--site']),
+    publicFolder: processArgs.publicFolder(rawArgs['--public_folder']),
     ports: {
       http: processArgs.port(rawArgs['--http_port'], rawArgs['--wss_port']),
       wss: processArgs.port(rawArgs['--wss_port'], rawArgs['--http_port'])

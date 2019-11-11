@@ -6,17 +6,12 @@ const fsp = require('../shared/fsp')
 const processHtml = require('./process-html')
 const constants = require('../shared/constants')
 
-const readSite = async (fpath, state, warn = true) => {
-  const cwd = process.cwd()
-  const fullPath = path.join(cwd, fpath)
-
-  const { siteData: previous, version } = state
-
+const readSiteStat = ({ fullPath, site, publicFolder }) => {
   try {
-    var stat = await fsp.stat(fullPath)
+    return fsp.stat(fullPath)
   } catch (err) {
     if (err.code === 'ENOENT') {
-      const thrown = errors.fileNotFound(`${fpath} not found (${cwd})`, codes.LR_005)
+      const thrown = errors.fileNotFound(`${site} not found (${publicFolder})`, codes.LR_005)
       thrown.warn = true
 
       throw thrown
@@ -24,6 +19,13 @@ const readSite = async (fpath, state, warn = true) => {
       console.log(err)
     }
   }
+}
+
+const readSite = async ({site, publicFolder, warn = true, state}) => {
+  const fullPath = path.join(publicFolder, site)
+
+  const { siteData: previous, version } = state
+  const stat = await readSiteStat({fullPath, site, publicFolder})
 
   if (previous && (previous.ctime === stat.ctimeMs && previous.mtime === stat.mtimeMs)) {
     previous.refreshed = false
@@ -38,7 +40,7 @@ const readSite = async (fpath, state, warn = true) => {
     refreshed = true
   } catch (err) {
     if (err.code === 'ENOENT') {
-      const thrown = errors.fileNotFound(`${fpath} not found (${cwd})`, codes.LR_005)
+      const thrown = errors.fileNotFound(`${site} not found (${publicFolder})`, codes.LR_005)
       thrown.warn = true
 
       throw thrown
@@ -47,7 +49,7 @@ const readSite = async (fpath, state, warn = true) => {
         var content = await fsp.readFile(fullPath)
       } catch (err) {
         if (err.code === 'ENOENT') {
-          const thrown = errors.fileNotFound(`${fpath} not found (${cwd})`, codes.LR_005)
+          const thrown = errors.fileNotFound(`${site} not found (${publicFolder})`, codes.LR_005)
           thrown.warn = true
 
           throw thrown
@@ -62,35 +64,35 @@ const readSite = async (fpath, state, warn = true) => {
 
   return {
     refreshed,
-    content: await processHtml(fpath, content.toString(), state),
-    fpath,
+    content: await processHtml(site, content.toString(), state),
+    fpath: site,
     ctime: stat.ctimeMs,
     mtime: stat.mtimeMs
   }
 }
 
-const readSiteData = async (siteArg, state, defaults) => {
-  if (siteArg) {
-    return readSite(siteArg, state)
+const readSiteData = async ({site, publicFolder, state}) => {
+  if (site) {
+    return readSite({
+      site,
+      publicFolder,
+      warn: true,
+      state
+    })
   } else {
-    // todo
-    let result = null
-    for (const fpath of defaults) {
-      try {
-        result = await readSite(fpath)
-        break
-      } catch (err) {
-
-      }
-    }
+    // -- todo.
   }
 }
 
-const prepareIndexFile = (pids, state, siteArg) => {
+const prepareIndexFile = ({pids, state, site, publicFolder}) => {
   const emitter = new EventEmitter()
 
   setInterval(async () => {
-    state.siteData = await readSiteData(siteArg, state, constants.sitePaths)
+    state.siteData = await readSiteData({
+      site,
+      publicFolder,
+      state
+    })
 
     if (state.siteData.refreshed) {
       emitter.emit('refresh', state.siteData)
