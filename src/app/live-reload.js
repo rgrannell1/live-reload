@@ -18,10 +18,19 @@ process.on('unhandledRejection', errUtils.report)
 
 const buildExit = {}
 
+/**
+ * Display a build-exception.
+ *
+ * @param {Error} err a build-exception.
+ */
 buildExit.error = err => {
   throw errors.buildError(`build process exited with non-zero status.\n\n${err.message}`, codes.LR_004)
 }
-
+/**
+ *
+ * Display that a build terminated
+ *
+ */
 buildExit.success = () => {
   throw errors.buildExit('build succeed but exited; live-reload builds should watch for file-changes persistantly', codes.LR_004)
 }
