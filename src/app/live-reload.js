@@ -6,6 +6,8 @@ const fsp = require('fs').promises
 const errors = require('@rgrannell/errors')
 const signale = require('signale')
 const express = require('express')
+const WebSocket = require('ws')
+
 const processHtml = require('./process-html')
 
 const constants = require('../shared/constants')
@@ -145,7 +147,7 @@ const readSite = async (fpath, state, warn = true) => {
   }
 
   return {
-    content: processHtml(fpath, content.toString(), state),
+    content: await processHtml(fpath, content.toString(), state),
     fpath,
     ctime: stat.ctimeMs,
     mtime: stat.mtimeMs
@@ -174,11 +176,25 @@ const serveIndex = state => (req, res) => {
   if (state && state.siteData && state.siteData.content && state.siteData.content.source) {
     res.send(state.siteData.content.source)
   } else {
-    console.log('not loaded')
+    console.log(state)
   }
 }
 
-const launchServer = async state => {
+const launchWsServer = async state => {
+  const wss = new WebSocket.Server({
+    port: 4001
+  })
+
+  wss.on('connection', ws => {
+    ws.on('message', message => {
+      console.log('foop.')
+    })
+
+    ws.send('something')
+  })
+}
+
+const launchStaticServer = async state => {
   const app = express()
   const port = 4000
 
@@ -189,6 +205,8 @@ const launchServer = async state => {
   app.listen(port, () => {
     signale.info(`live-reload running http://localhost:${port}`)
   })
+
+
 }
 
 const launchSite = async (pids, state, siteArg) => {
@@ -209,7 +227,8 @@ const liveReload = async args => {
     version: 0
   }
 
-  launchServer(state)
+  launchWsServer(state)
+  launchStaticServer(state)
   launchBuild(pids, args.build)
   launchSite(pids, state, args.site)
 }
