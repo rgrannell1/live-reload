@@ -5,8 +5,12 @@ const errors = require('@rgrannell/errors')
 const express = require('express')
 const signale = require('signale')
 
-const launchStaticServer = require('./launch-static-server')
-const launchWsServer = require('./launch-ws-server')
+const launch = {
+  staticServer: require('./launch-static-server'),
+  wsServer: require('./launch-ws-server'),
+  build: require('./launch-build'),
+}
+
 const prepareIndexFile = require('./prepare-index-file')
 
 const constants = require('../shared/constants')
@@ -20,39 +24,6 @@ const asEvent = data => {
 
 process.on('unhandledRejection', errUtils.report)
 
-const buildExit = {}
-
-/**
- * Display a build-exception.
- *
- * @param {Error} err a build-exception.
- */
-buildExit.error = err => {
-  throw errors.buildError(`build process exited with non-zero status.\n\n${err.message}`, codes.LR_004)
-}
-/**
- *
- * Display that a build terminated
- *
- */
-buildExit.success = () => {
-  throw errors.buildExit('build succeed but exited; live-reload builds should watch for file-changes persistantly', codes.LR_004)
-}
-
-/**
- *
- * @param {Object} pids
- * @param {string} buildArg
- */
-const launchBuild = (pids, hide, buildArg) => {
-  // -- builds are continuous so we can't block with 'await'
-  // -- promise rejections will be unhandled though
-  const build = execa.command(buildArg)
-    .then(buildExit.success)
-    .catch(buildExit.error)
-
-  pids.build = build
-}
 
 /**
  * Run live-reload with processed arguments.
@@ -66,8 +37,8 @@ const liveReload = async args => {
     version: 0
   }
 
-  launchStaticServer(state, args.ports.http)
-  launchBuild(pids, args.hide, args.build)
+  launch.staticServer(state, args.publicFolder, args.ports.http)
+  launch.build(pids, args.hide, args.build)
 
   const contentChange = prepareIndexFile({
     pids,
@@ -76,7 +47,7 @@ const liveReload = async args => {
     publicFolder: args.publicFolder
   })
 
-  const wss = await launchWsServer(state, args.ports.wss)
+  const wss = await launch.wsServer(state, args.ports.wss)
 
   const {events} = constants
 

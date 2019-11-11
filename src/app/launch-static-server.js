@@ -18,26 +18,17 @@ const serveIndex = state => (req, res) => {
 }
 
 /**
- * Find the location of the static file server
- *
- * @returns {string} the public folder path
- */
-const findStaticFolder = () => {
-  return '.'
-}
-
-/**
  * launch the static-server
  *
  * @param {Object} state the application's state object
  * @param {number} port the port on which to run the static-server
  */
-const launchStaticServer = async (state, port) => {
+const launchStaticServer = async (state, publicFolder, port) => {
   const app = express()
 
   app.get('/', serveIndex(state))
 
-  app.use(express.static(findStaticFolder()))
+  app.use(express.static(publicFolder))
 
   app.listen(port, () => {
     signale.info(`running http://localhost:${port} 🔄`)

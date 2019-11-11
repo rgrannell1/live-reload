@@ -83,6 +83,7 @@ const readSiteOnChange = async ({site, publicFolder, state}) => {
       refreshed,
       content: await processHtml(site, content.toString(), state),
       fpath: site,
+      publicFolder,
       ctime: stat.ctimeMs,
       mtime: stat.mtimeMs
     }
