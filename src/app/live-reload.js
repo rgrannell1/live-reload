@@ -1,40 +1,20 @@
 
 const path = require('path')
 const execa = require('execa')
-const fs = require('fs')
 const errors = require('@rgrannell/errors')
-const signale = require('signale')
 const express = require('express')
-const WebSocket = require('ws')
-const EventEmitter = require('events')
 
 const processHtml = require('./process-html')
 
 const launchStaticServer = require('./launch-static-server')
+const launchWsServer = require('./launch-ws-server')
 
+const fsp = require('../shared/fsp')
 const constants = require('../shared/constants')
 const {codes} = require('../shared/constants')
 const errUtils = require('../shared/errors')
 
 process.on('unhandledRejection', errUtils.report)
-
-const fsp = {}
-
-fsp.readFile = fpath => {
-  return new Promise((resolve, reject) => {
-    fs.readFile(fpath, (err, content) => {
-      err ? reject(err) : resolve(content)
-    })
-  })
-}
-
-fsp.stat = fpath => {
-  return new Promise((resolve, reject) => {
-    fs.stat(fpath, (err, stats) => {
-      err ? reject(err) : resolve(stats)
-    })
-  })
-}
 
 const processArgs = {}
 
@@ -197,25 +177,7 @@ const readSiteData = async (siteArg, state, defaults) => {
 
 }
 
-const launchWsServer = async state => {
-  const wss = new WebSocket.Server({
-    port: 4001
-  })
 
-  const emitter = new EventEmitter()
-
-  wss.on('connection', ws => {
-    ws.on('message', event => {
-      emitter.emit('message', event)
-    })
-
-    emitter.emit('connection', ws)
-
-    signale.info('websocket server established')
-  })
-
-  return emitter
-}
 
 
 const launchSite = (pids, state, siteArg) => {
@@ -250,7 +212,6 @@ const liveReload = async args => {
   }
 
   const wss = await launchWsServer(state)
-
 
   launchStaticServer(state, ports.http)
   launchBuild(pids, args.build)
