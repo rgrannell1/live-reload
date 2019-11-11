@@ -1,20 +1,19 @@
 name:        live-reload
 grade:       stable
 version:     v0.1.0
-summary:     Live-reload is a build-framework agnostic tool for reloading a static-site during development .
-description: Live-reload is a build-framework agnostic tool for reloading a static-site during development
-
+summary:     Live-reload is a build-framework agnostic website reloading tool.
+description: Live-reload is a build-framework agnostic website reloading tool
 confinement: strict
 
 base: core18
 
 apps:
-  polonium:
+  live-reload:
     command: bin/live-reload
     plugs: ['network']
 
 parts:
-  polonium:
+  live-reload:
     source: .
     plugin: nodejs
     nodejs-package-manager: npm

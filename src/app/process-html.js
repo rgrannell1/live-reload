@@ -14,9 +14,14 @@ const processHtml = async (fpath, html, state) => {
     })
   })
 
+  const consts = JSON.stringify({
+    version: `v${state.version}`,
+    port: 4001
+  })
+
   try {
     const $ = cheerio.load(html)
-    const $script = $(`<script>${code}</script>`)
+    const $script = $(`<script>window.constants = ${consts}; ${code}</script>`)
 
     $('head').append($script)
 

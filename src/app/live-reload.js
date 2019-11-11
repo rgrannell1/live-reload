@@ -3,6 +3,7 @@ const path = require('path')
 const execa = require('execa')
 const errors = require('@rgrannell/errors')
 const express = require('express')
+const signale = require('signale')
 
 const launchStaticServer = require('./launch-static-server')
 const launchWsServer = require('./launch-ws-server')
@@ -60,6 +61,10 @@ const liveReload = async args => {
     contentChange.on('refresh', () => {
       ws.send('message', 'refresh')
     })
+  })
+
+  wss.on('message', event => {
+    signale.info(`${event.version} is running in browser`)
   })
 }
 

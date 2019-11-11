@@ -20,7 +20,7 @@ const launchStaticServer = async (state, port) => {
   app.use(express.static(findStaticFolder()))
 
   app.listen(port, () => {
-    signale.info(`live-reload running http://localhost:${port}`)
+    signale.info(`running http://localhost:${port} 🔄`)
   })
 }
 
