@@ -21,17 +21,7 @@ const readSiteStat = ({ fullPath, site, publicFolder }) => {
   }
 }
 
-const readSite = async ({site, publicFolder, warn = true, state}) => {
-  const fullPath = path.join(publicFolder, site)
-
-  const { siteData: previous, version } = state
-  const stat = await readSiteStat({fullPath, site, publicFolder})
-
-  if (previous && (previous.ctime === stat.ctimeMs && previous.mtime === stat.mtimeMs)) {
-    previous.refreshed = false
-    return previous
-  }
-
+const readSite = async ({site, fullPath, publicFolder,state}) => {
   let refreshed = false
 
   try {
@@ -45,22 +35,33 @@ const readSite = async ({site, publicFolder, warn = true, state}) => {
 
       throw thrown
     } else {
-      try {
-        var content = await fsp.readFile(fullPath)
-      } catch (err) {
-        if (err.code === 'ENOENT') {
-          const thrown = errors.fileNotFound(`${site} not found (${publicFolder})`, codes.LR_005)
-          thrown.warn = true
-
-          throw thrown
-        } else {
-          console.log(err)
-        }
-      }
-
-      console.log(err)
+      console.error(err)
     }
   }
+
+  return {
+    refreshed,
+    content
+  }
+}
+
+const readSiteOnChange = async ({site, publicFolder, warn = true, state}) => {
+  const fullPath = path.join(publicFolder, site)
+
+  const { siteData: previous, version } = state
+  const stat = await readSiteStat({fullPath, site, publicFolder})
+
+  if (previous && (previous.ctime === stat.ctimeMs && previous.mtime === stat.mtimeMs)) {
+    previous.refreshed = false
+    return previous
+  }
+
+  const {refreshed, content} = await readSite({
+    site,
+    fullPath,
+    publicFolder,
+    state
+  })
 
   return {
     refreshed,
@@ -73,7 +74,7 @@ const readSite = async ({site, publicFolder, warn = true, state}) => {
 
 const readSiteData = async ({site, publicFolder, state}) => {
   if (site) {
-    return readSite({
+    return readSiteOnChange({
       site,
       publicFolder,
       warn: true,
@@ -84,7 +85,7 @@ const readSiteData = async ({site, publicFolder, state}) => {
   }
 }
 
-const prepareIndexFile = ({pids, state, site, publicFolder}) => {
+const prepareIndexFile = ({state, site, publicFolder}) => {
   const emitter = new EventEmitter()
 
   setInterval(async () => {
