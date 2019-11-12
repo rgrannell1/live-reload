@@ -5,7 +5,6 @@ const asEvent = data => {
 
 const fromEvent = data => {
   try {
-    debugger
     return JSON.parse(data.data)
   } catch (err) {
     console.error(`live-reload: failed to read event as json \n${data}`)
@@ -16,6 +15,8 @@ const socket = new WebSocket(`ws://localhost:${constants.port}`)
 
 // -- connect to the server
 socket.addEventListener('open', event => {
+  console.error('live-reload: websocket connection open')
+
   socket.send(asEvent({
     version: constants.version
   }))
@@ -33,10 +34,12 @@ eventHandlers.refresh = () => {
 const handleMessage = data => {
   const event = fromEvent(data)
 
+  console.error(`live-reload: event received with tag ${event.tag}`)
+
   if (eventHandlers.hasOwnProperty(event.tag)) {
     eventHandlers[event.tag](event)
   } else {
-    console.error('tag cannot be interpreted correctly')
+    console.error('live-reload: tag cannot be interpreted correctly')
   }
 }
 

@@ -19,6 +19,15 @@ const asEvent = data => {
 
 process.on('unhandledRejection', errUtils.report)
 
+const onBrowserReport = state => event => {
+  const expected = `v${state.version}`
+  if (event.version === expected) {
+    signale.info(`${event.version} is running in browser`)
+  } else {
+    signale.warn(`${event.version} is running in the browser, but it should run ${expected}`)
+  }
+}
+
 /**
  * Run live-reload with processed arguments.
  *
@@ -53,9 +62,7 @@ const liveReload = async args => {
     })
   })
 
-  wss.on(events.message, event => {
-    signale.info(`${event.version} is running in browser`)
-  })
+  wss.on(events.message, onBrowserReport(state))
 }
 
 /**
