@@ -13,14 +13,17 @@ const fromEvent = data => {
 
 const socket = new WebSocket(`ws://localhost:${constants.port}`)
 
-// -- connect to the server
-socket.addEventListener('open', event => {
-  console.error('live-reload: websocket connection open')
+const onSocketConnection = event => {
+  console.info('live-reload: websocket connection open')
 
   socket.send(asEvent({
-    version: constants.version
+    tag: 'connectionOpen',
+    version: constants.version,
+    session: constants.session
   }))
-})
+
+  handleServiceWorkers(socket)
+}
 
 const eventHandlers = {}
 
@@ -43,4 +46,34 @@ const handleMessage = data => {
   }
 }
 
+const hasRegistrations = async () => {
+  const registrations = await navigator.serviceWorker.getRegistrations()
+  return registrations.length > 0
+}
+
+const removeRegistrations = async () => {
+  const registrations = await navigator.serviceWorker.getRegistrations()
+
+  for (const registration of registrations) {
+    const succeeded = await registration.unregister()
+  }
+}
+
+const handleServiceWorkers = async socket => {
+  await removeRegistrations()
+
+  if (await hasRegistrations()) {
+    socket.send(asEvent({
+      tag: 'serviceWorkerDetectedAfterUnregister'
+    }))
+  } else {
+    socket.send(asEvent({
+      tag: 'serviceWorkerUnregistered'
+    }))
+  }
+
+}
+
+// -- connect to the server
+socket.addEventListener('open', onSocketConnection)
 socket.addEventListener('message', handleMessage)

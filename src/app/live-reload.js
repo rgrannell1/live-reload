@@ -1,13 +1,13 @@
 
 const signale = require('signale')
+const koremutake = require('../shared/koremutake')
+const prepareIndexFile = require('./prepare-index-file')
 
 const launch = {
   staticServer: require('./launch-static-server'),
   wsServer: require('./launch-ws-server'),
   build: require('./launch-build')
 }
-
-const prepareIndexFile = require('./prepare-index-file')
 
 const constants = require('../shared/constants')
 const errUtils = require('../shared/errors')
@@ -19,13 +19,35 @@ const asEvent = data => {
 
 process.on('unhandledRejection', errUtils.report)
 
-const onBrowserReport = state => event => {
+const eventHandlers = {}
+
+eventHandlers.connectionOpen = (state, event) => {
+  if (state.session !== event.session) {
+    signale.warn(`expected connection from session ${state.session} but received from session ${event.session}`)
+  }
+
   const expected = `v${state.version}`
   if (event.version === expected) {
     signale.info(`${event.version} is running in browser`)
   } else {
     signale.warn(`${event.version} is running in the browser, but it should run ${expected}`)
   }
+}
+
+const handleBrowserMessages = state => event => {
+  if (eventHandlers.hasOwnProperty(event.tag)) {
+    eventHandlers[event.tag](state, event)
+  } else {
+    throw new Error(`message with unsupported tag ${event.tag} received from browser`)
+  }
+}
+
+eventHandlers.serviceWorkerUnregistered = (state, event) => {
+  signale.warn('live-reload disabled service-workers to prevent caching')
+}
+
+eventHandlers.serviceWorkerDetectedAfterUnregister = (state, event) => {
+  signale.warn('failed to unregister service-workers')
 }
 
 /**
@@ -37,7 +59,8 @@ const liveReload = async args => {
   const pids = {}
 
   const state = {
-    version: 0
+    version: 0,
+    session: koremutake()
   }
 
   launch.staticServer(state, args.publicFolder, args.ports.http)
@@ -62,7 +85,7 @@ const liveReload = async args => {
     })
   })
 
-  wss.on(events.message, onBrowserReport(state))
+  wss.on(events.message, handleBrowserMessages(state))
 }
 
 /**

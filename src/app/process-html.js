@@ -15,6 +15,7 @@ const processHtml = async (fpath, html, state) => {
   })
 
   const consts = JSON.stringify({
+    session: state.session,
     version: `v${state.version}`,
     port: 4001
   })
