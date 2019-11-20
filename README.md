@@ -1,6 +1,9 @@
 # live-reload
 
-`live-reload`
+`live-reload` runs an arbitrary build process (e.g `webpack --watch`) and automatically reloads a website on localhost whenever files change. This helps bypass the completely frustrating process of setting up live-website reloading.
+
+- Triggers the site to reload on change via a websocket connection
+- Detects and disables service-workers, clears application-caches
 
 ![example image](example.png)
 
