@@ -57,6 +57,12 @@ const removeRegistrations = async () => {
   for (const registration of registrations) {
     const succeeded = await registration.unregister()
   }
+
+  const cacheNames = await caches.keys()
+
+  for (const cacheName of cacheNames) {
+    await caches.delete(cacheName)
+  }
 }
 
 const handleServiceWorkers = async socket => {
