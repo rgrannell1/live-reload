@@ -8,9 +8,9 @@ const processHtml = require('./process-html')
 const constants = require('../shared/constants')
 const { codes } = constants
 
-const readSiteStat = ({ fullPath, site, publicFolder }) => {
+const readSiteStat = async ({ fullPath, site, publicFolder }) => {
   try {
-    return fsp.stat(fullPath)
+    return await fsp.stat(fullPath)
   } catch (err) {
     if (err.code === 'ENOENT') {
       const thrown = errors.fileNotFound(`${site} not found (${publicFolder})`, codes.LR_005)
