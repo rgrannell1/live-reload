@@ -22,6 +22,8 @@ const onSocketConnection = event => {
     session: constants.session
   }))
 
+  document.title = constants.version
+
   handleServiceWorkers(socket)
 }
 

@@ -1,6 +1,6 @@
 # live-reload
 
-`live-reload`
+`live-reload` solves a common problem I ran into when developing websites; setting up live-reloading was very difficult.
 
 ![example image](example.png)
 
