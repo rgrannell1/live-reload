@@ -30,8 +30,16 @@ const launchStaticServer = async (state, publicFolder, port) => {
 
   app.use(express.static(publicFolder))
 
-  app.listen(port, () => {
+  app
+  .listen(port, () => {
     signale.info(`running http://localhost:${port} 🔄`)
+  })
+  .on('error', err => {
+    if (err.code === 'EADDRINUSE') {
+      signale.fatal(`port ${port} is already in use; is live-reload already running?`)
+      process.exit(1)
+    }
+    throw err
   })
 }
 
