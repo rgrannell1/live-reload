@@ -30,9 +30,11 @@ const launchStaticServer = async (state, publicFolder, port) => {
 
   app.use(express.static(publicFolder))
 
+  const nodeEnv = process.env.NODE_ENV
+
   app
   .listen(port, () => {
-    signale.info(`running http://localhost:${port} 🔄`)
+    signale.info(`running http://localhost:${port} 🔄: NODE_ENV is ${nodeEnv ? nodeEnv : 'not set'}`)
   })
   .on('error', err => {
     if (err.code === 'EADDRINUSE') {
