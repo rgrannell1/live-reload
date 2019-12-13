@@ -7,6 +7,7 @@ const pkg = require('../../package.json')
 
 const doc = `
 Usage:
+  live-reload --package
   live-reload [--build=<command>] (--site=<path>) (--public_folder=<path>) [--hide-build-stdout] [--hide-build-stderr] [--http_port=<port>] [--wss_port=<port>]
 
 Author:

@@ -1,4 +1,5 @@
 
+const path = require('path')
 const signale = require('signale')
 const koremutake = require('../shared/koremutake')
 const prepareIndexFile = require('./prepare-index-file')
@@ -50,31 +51,17 @@ eventHandlers.serviceWorkerDetectedAfterUnregister = (state, event) => {
   signale.warn('failed to unregister service-workers')
 }
 
-/**
- * Run live-reload with processed arguments.
- *
- * @param {Object} args arguments supplied to live-reload after processing.
- */
-const liveReload = async args => {
-  const pids = {}
-
-  const state = {
-    version: 0,
-    session: koremutake()
-  }
-
-  launch.staticServer(state, args.publicFolder, args.ports.http)
-  launch.build(pids, args.hide, args.build)
+const serveSite = async (state, args, pids) => {
+  launch.staticServer(state, args.site.publicFolder, args.site.ports.http)
 
   const contentChange = prepareIndexFile({
     pids,
     state,
-    site: args.site,
-    publicFolder: args.publicFolder
+    site: args.site.path,
+    publicFolder: args.site.publicFolder
   })
 
-  const wss = await launch.wsServer(state, args.ports.wss)
-
+  const wss = await launch.wsServer(state, args.site.ports.wss)
   const { events } = constants
 
   wss.on(events.connection, ws => {
@@ -89,23 +76,43 @@ const liveReload = async args => {
 }
 
 /**
+ * Run live-reload with processed arguments.
+ *
+ * @param {Object} args arguments supplied to live-reload after processing.
+ */
+const liveReload = async args => {
+  const pids = {}
+
+  const state = {
+    version: 0,
+    session: koremutake()
+  }
+
+  for (const build of args.build) {
+    const hide = {
+      stderr: build.stderr || true,
+      stdout: build.stdout || true
+    }
+
+    launch.build(pids, hide, build)
+  }
+
+  if (args.site) {
+    await serveSite(state, args, pids)
+  }
+}
+
+/**
  * Run the live-reload applications
  *
  * @param {Object} rawArgs arguments provided by the docopt interface
  */
 const callApplication = async rawArgs => {
-  const args = {
-    build: await processArgs.build(rawArgs['--build']),
-    site: processArgs.site(rawArgs['--site']),
-    publicFolder: processArgs.publicFolder(rawArgs['--public_folder']),
-    ports: {
-      http: processArgs.port(rawArgs['--http_port'], rawArgs['--wss_port']),
-      wss: processArgs.port(rawArgs['--wss_port'], rawArgs['--http_port'])
-    },
-    hide: {
-      stdout: rawArgs['hide-build-stdout'],
-      stderr: rawArgs['hide-build-stderr']
-    }
+  let args;
+
+  if (rawArgs['--package']) {
+    const package = require(path.join(process.cwd(), './package.json'))
+    args = processArgs.package(package)
   }
 
   await liveReload(args)

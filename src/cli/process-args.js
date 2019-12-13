@@ -4,6 +4,7 @@ const path = require('path')
 const errors = require('@rgrannell/errors')
 const constants = require('../shared/constants')
 const { codes } = require('../shared/constants')
+const jsonSchema = require('jsonschema').validate
 
 const processArgs = {}
 
@@ -79,6 +80,124 @@ processArgs.site = siteArg => {
 
 processArgs.publicFolder = publicFolderArg => {
   return path.resolve(publicFolderArg)
+}
+
+const schemas = {}
+
+schemas.buildItem = {
+  anyOf: [
+    {
+      type: 'string'
+    },
+    {
+      type: 'object',
+      required: ['command'],
+      properties: {
+        command: {
+          type: 'string'
+        },
+        hideStdout: {
+          type: 'boolean'
+        },
+        hideStderr: {
+          type: 'boolean'
+        }
+      }
+    }
+  ]
+}
+
+schemas.api = {
+  type: 'object',
+  required: [],
+  properties: {
+
+  }
+}
+
+schemas.site = {
+  type: 'object',
+  required: ['path', 'publicFolder', 'watch'],
+  properties: {
+    path: {
+      type: 'string'
+    },
+    publicFolder: {
+      type: 'string'
+    },
+    watch: {
+      type: 'array',
+      items: {
+        type: 'string'
+      }
+    },
+    ports: {
+      type: 'object',
+      properties: {
+        http: {
+          type: 'number',
+          minimum: 0,
+          maximum: 65535
+        },
+        wss: {
+          type: 'number',
+          minimum: 0,
+          maximum: 65535
+        }
+      }
+    }
+  }
+}
+
+const packageSchema = {
+  id: '/package',
+  type: 'object',
+  anyOf: [
+    {
+      required: ['site']
+    },
+    {
+      required: ['api']
+    }
+  ],
+  properties: {
+    build: {
+      type: 'array',
+      items: schemas.buildItem
+    },
+    site: schemas.site,
+    api: schemas.api
+  }
+}
+
+processArgs.package = packageJson => {
+  if (!packageJson['live-reload']) {
+    throw errors.missingConfig('no "live-reload" configuration found in package.json', codes.MISSING_CONFIG)
+  }
+
+  const config = packageJson['live-reload']
+  const report = jsonSchema(config, packageSchema)
+
+  const message = report.errors.map(error => {
+    return `${error.message} (${error.schema})`
+  }).join('\n')
+
+  if (message) {
+    throw errors.invalidConfig(message)
+  }
+
+  if (!config.build) {
+    config.build = []
+  }
+
+  if (config.site && !config.site.ports) {
+    config.site.ports = {
+      http: constants.ports.http,
+      wss: constants.ports.wss
+    }
+  }
+
+  return config
 }
 
 module.exports = processArgs
