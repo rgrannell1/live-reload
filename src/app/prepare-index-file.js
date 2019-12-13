@@ -8,6 +8,13 @@ const processHtml = require('./process-html')
 const constants = require('../shared/constants')
 const { codes } = constants
 
+/**
+ * Read the site's file state
+ *
+ * @param {string} config.fullPath the path of the site
+ * @param {string} config.site the name of the site
+ * @param {string} config.publicFolder the folder searched
+ */
 const readSiteStat = async ({ fullPath, site, publicFolder }) => {
   try {
     return await fsp.stat(fullPath)
