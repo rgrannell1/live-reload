@@ -14,14 +14,14 @@ const { codes } = constants
  *
  * @param {string} config.fullPath the path of the site
  * @param {string} config.site the name of the site
- * @param {string} config.publicFolder the folder searched
+ * @param {string} config.publicDir the folder searched
  */
-const readSiteStat = async ({ fullPath, site, publicFolder }) => {
+const readSiteStat = async ({ fullPath, site, publicDir }) => {
   try {
     return await fsp.stat(fullPath)
   } catch (err) {
     if (err.code === 'ENOENT') {
-      const thrown = errors.fileNotFound(`${site} not found (${publicFolder})`, codes.LR_005)
+      const thrown = errors.fileNotFound(`${site} not found (${publicDir})`, codes.LR_005)
       thrown.warn = true
 
       throw thrown
@@ -31,7 +31,7 @@ const readSiteStat = async ({ fullPath, site, publicFolder }) => {
   }
 }
 
-const readSite = async ({ site, fullPath, publicFolder, state }) => {
+const readSite = async ({ site, fullPath, publicDir, state }) => {
   let refreshed = false
 
   try {
@@ -40,7 +40,7 @@ const readSite = async ({ site, fullPath, publicFolder, state }) => {
     refreshed = true
   } catch (err) {
     if (err.code === 'ENOENT') {
-      const thrown = errors.fileNotFound(`${site} not found (${publicFolder})`, codes.LR_005)
+      const thrown = errors.fileNotFound(`${site} not found (${publicDir})`, codes.LR_005)
       thrown.warn = true
 
       throw thrown
@@ -72,11 +72,11 @@ const hasSameEditTimes = (stat, previous) => {
   return hasSameCtime && hasSameMtime
 }
 
-const readSiteOnChange = async ({ site, publicFolder, state }) => {
-  const fullPath = path.join(publicFolder, site)
+const readSiteOnChange = async ({ site, publicDir, state }) => {
+  const fullPath = path.join(publicDir, site)
 
   const { siteData: previous } = state
-  const stat = await readSiteStat({ fullPath, site, publicFolder })
+  const stat = await readSiteStat({ fullPath, site, publicDir })
 
   if (hasSameEditTimes(stat, previous)) {
     previous.refreshed = false
@@ -85,7 +85,7 @@ const readSiteOnChange = async ({ site, publicFolder, state }) => {
     const { refreshed, content } = await readSite({
       site,
       fullPath,
-      publicFolder,
+      publicDir,
       state
     })
 
@@ -93,14 +93,14 @@ const readSiteOnChange = async ({ site, publicFolder, state }) => {
       refreshed,
       content: await processHtml(site, content.toString(), state),
       fpath: site,
-      publicFolder,
+      publicDir,
       ctime: stat.ctimeMs,
       mtime: stat.mtimeMs
     }
   }
 }
 
-const prepareIndexFile = ({ state, watch, site, publicFolder }) => {
+const prepareIndexFile = ({ state, watch, site, publicDir }) => {
   const emitter = new EventEmitter()
 
   const { events } = constants
@@ -112,7 +112,7 @@ const prepareIndexFile = ({ state, watch, site, publicFolder }) => {
   watcher.on('all', async (event, fpath) => {
     const siteData = await readSiteOnChange({
       site,
-      publicFolder,
+      publicDir,
       state
     })
 

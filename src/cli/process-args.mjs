@@ -78,8 +78,8 @@ processArgs.site = siteArg => {
   return siteArg
 }
 
-processArgs.publicFolder = publicFolderArg => {
-  return path.resolve(publicFolderArg)
+processArgs.publicDir = publicDirArg => {
+  return path.resolve(publicDirArg)
 }
 
 const schemas = {}
@@ -133,12 +133,12 @@ schemas.api = {
 
 schemas.site = {
   type: 'object',
-  required: ['path', 'publicFolder', 'watch'],
+  required: ['path', 'publicDir', 'watch'],
   properties: {
     path: {
       type: 'string'
     },
-    publicFolder: {
+    publicDir: {
       type: 'string'
     },
     watch: {

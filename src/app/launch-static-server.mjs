@@ -23,12 +23,12 @@ const serveIndex = state => (req, res) => {
  * @param {Object} state the application's state object
  * @param {number} port the port on which to run the static-server
  */
-const launchStaticServer = async (state, publicFolder, port) => {
+const launchStaticServer = async (state, publicDir, port) => {
   const app = express()
 
   app.get('/', serveIndex(state))
 
-  app.use(express.static(publicFolder))
+  app.use(express.static(publicDir))
 
   const nodeEnv = process.env.NODE_ENV
 
