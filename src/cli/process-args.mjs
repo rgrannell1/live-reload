@@ -109,9 +109,25 @@ schemas.buildItem = {
 
 schemas.api = {
   type: 'object',
-  required: [],
+  required: ['path', 'watch'],
   properties: {
-
+    path: {
+      type: 'string'
+    },
+    port: {
+      type: 'number'
+    },
+    env: {
+      type: 'object',
+      properties: {
+        path: {
+          type: 'string'
+        },
+        vars: {
+          type: 'object'
+        }
+      }
+    }
   }
 }
 
