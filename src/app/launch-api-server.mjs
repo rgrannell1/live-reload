@@ -1,4 +1,5 @@
 
+import signale from 'signale'
 import * as path from 'path'
 
 /**
@@ -21,7 +22,9 @@ const launchApiServer = (state, fpath, port) => {
   }
 
   serverPromise.then(server => {
-    serverPromise
+    const nodeEnv = process.env.NODE_ENV
+
+    server.default
       .listen(port, () => {
         signale.info(`running API on http://localhost:${port} 🔄: NODE_ENV is ${nodeEnv ? nodeEnv : 'not set'}`)
       })
