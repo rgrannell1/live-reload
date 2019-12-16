@@ -1,13 +1,13 @@
 
 import * as path from 'path'
-import * as chokidar from 'chokidar'
-import * as EventEmitter from 'events'
-import * as errors from '@rgrannell/errors'
+import chokidar from 'chokidar'
+import EventEmitter from 'events'
+import errors from '@rgrannell/errors'
 
 import fsp from '../shared/fsp'
 import processHtml from './process-html'
 import constants from '../shared/constants'
-import { codes } from '../shared/constants'
+const { codes } = constants
 
 /**
  * Read the site's file state
@@ -101,6 +101,10 @@ const readSiteOnChange = async ({ site, publicFolder, state }) => {
 }
 
 const prepareIndexFile = ({ state, watch, site, publicFolder }) => {
+  console.log(EventEmitter )
+  console.log(EventEmitter )
+  console.log(EventEmitter )
+  console.log(EventEmitter )
   const emitter = new EventEmitter()
 
   const { events } = constants

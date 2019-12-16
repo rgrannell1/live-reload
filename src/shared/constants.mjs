@@ -24,7 +24,7 @@ export default {
     'client/html/index.html'
   ],
   paths: {
-    liveReload: path.join(__dirname, '../../static/live-reload.js')
+    liveReload: path.resolve('../../static/live-reload.js')
   },
   ports: {
     wss: 4001,

@@ -1,12 +1,10 @@
 
 import * as fs from 'fs'
 import * as path from 'path'
-import * as errors from '@rgrannell/errors'
+import errors from '@rgrannell/errors'
 import constants from '../shared/constants'
-import { codes } from '../shared/constants'
-import { validate } from 'jsonschema'
-
-const jsonSchema = validate
+const { codes } = constants
+import jsonSchema from 'jsonschema'
 
 const processArgs = {}
 
@@ -178,7 +176,7 @@ processArgs.package = packageJson => {
   }
 
   const config = packageJson['live-reload']
-  const report = jsonSchema(config, packageSchema)
+  const report = jsonSchema.validate(config, packageSchema)
 
   const message = report.errors.map(error => {
     return `${error.message} (${error.schema})`

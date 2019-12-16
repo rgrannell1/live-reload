@@ -4,16 +4,21 @@ import * as signale from 'signale'
 import koremutake from '../shared/koremutake'
 import prepareIndexFile from './prepare-index-file'
 
+import apiServer from './launch-api-server'
+import staticServer from './launch-static-server'
+import wsServer from './launch-ws-server'
+import build from './launch-build'
+
 const launch = {
-  apiServer: require('./launch-api-server'),
-  staticServer: require('./launch-static-server'),
-  wsServer: require('./launch-ws-server'),
-  build: require('./launch-build')
+  apiServer,
+  staticServer,
+  wsServer,
+  build
 }
 
-const constants = require('../shared/constants')
-const errUtils = require('../shared/errors')
-const processArgs = require('../cli/process-args')
+import constants from '../shared/constants'
+import errUtils from '../shared/errors'
+import processArgs from '../cli/process-args'
 
 const asEvent = data => {
   return JSON.stringify(data)
@@ -121,8 +126,12 @@ const callApplication = async rawArgs => {
   let args;
 
   if (rawArgs['--package']) {
-    const package = require(path.join(process.cwd(), './package.json'))
-    args = processArgs.package(package)
+    const packageLocation = path.join(process.cwd(), './package.json')
+    return import(packageLocation).then(packageJson => {
+
+      args = processArgs.package(packageJson.default)
+      return liveReload(args)
+    })
   }
 
   await liveReload(args)

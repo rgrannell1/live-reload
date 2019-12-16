@@ -1,6 +1,6 @@
 
-import * as signale from 'signale'
-import * as express from 'express'
+import signale from 'signale'
+import express from 'express'
 
 /**
  * Serve the index html to the user file.

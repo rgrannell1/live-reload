@@ -5,7 +5,7 @@ import * as signale from 'signale'
 import * as moment from 'moment'
 import * as fs from 'fs'
 
-const constants = require('../shared/constants')
+import constants from '../shared/constants'
 
 const processHtml = async (fpath, html, state) => {
   const code = await new Promise((resolve, reject) => {

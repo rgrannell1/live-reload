@@ -1,5 +1,5 @@
 
-import * as signale from 'signale'
+import signale from 'signale'
 
 const state = {
   previous: ''

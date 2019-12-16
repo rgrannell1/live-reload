@@ -3,11 +3,15 @@
 import docopt from 'docopt'
 
 import * as fs from 'fs'
+import * as path from 'path'
 
 import errUtils from '../shared/errors'
 import constants from '../shared/constants'
+import liveReload from '../app/live-reload'
 
-const pkg = JSON.parse(fs.readFileSync('../../package.json').toString())
+const packageLocation = path.resolve('./package.json')
+
+const pkg = JSON.parse(fs.readFileSync(packageLocation).toString())
 
 const doc = `
 Usage:
@@ -21,6 +25,4 @@ Description:
 
 `
 
-const liveReload = require('../app/live-reload')
-
-liveReload(docopt(doc)).catch(errUtils.report)
+liveReload(docopt.docopt(doc)).catch(errUtils.report)
