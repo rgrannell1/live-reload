@@ -1,12 +1,13 @@
 
-const path = require('path')
-const EventEmitter = require('events')
-const errors = require('@rgrannell/errors')
+import * as path from 'path'
+import * as chokidar from 'chokidar'
+import * as EventEmitter from 'events'
+import * as errors from '@rgrannell/errors'
 
-const fsp = require('../shared/fsp')
-const processHtml = require('./process-html')
-const constants = require('../shared/constants')
-const { codes } = constants
+import fsp from '../shared/fsp'
+import processHtml from './process-html'
+import constants from '../shared/constants'
+import { codes } from '../shared/constants'
 
 /**
  * Read the site's file state
@@ -99,12 +100,16 @@ const readSiteOnChange = async ({ site, publicFolder, state }) => {
   }
 }
 
-const prepareIndexFile = ({ state, site, publicFolder }) => {
+const prepareIndexFile = ({ state, watch, site, publicFolder }) => {
   const emitter = new EventEmitter()
 
   const { events } = constants
 
-  setInterval(async () => {
+  const watcher = chokidar.watch(watch, {
+    persistent: true
+  })
+
+  watcher.on('all', async (event, fpath) => {
     const siteData = await readSiteOnChange({
       site,
       publicFolder,
@@ -117,9 +122,9 @@ const prepareIndexFile = ({ state, site, publicFolder }) => {
     }
 
     state.siteData = siteData
-  }, constants.intervals.updateIndexFile)
+  })
 
   return emitter
 }
 
-module.exports = prepareIndexFile
+export default prepareIndexFile

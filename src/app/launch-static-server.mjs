@@ -1,6 +1,6 @@
 
-const signale = require('signale')
-const express = require('express')
+import * as signale from 'signale'
+import * as express from 'express'
 
 /**
  * Serve the index html to the user file.
@@ -33,16 +33,16 @@ const launchStaticServer = async (state, publicFolder, port) => {
   const nodeEnv = process.env.NODE_ENV
 
   app
-  .listen(port, () => {
-    signale.info(`running http://localhost:${port} 🔄: NODE_ENV is ${nodeEnv ? nodeEnv : 'not set'}`)
-  })
-  .on('error', err => {
-    if (err.code === 'EADDRINUSE') {
-      signale.fatal(`port ${port} is already in use; is live-reload already running?`)
-      process.exit(1)
-    }
-    throw err
-  })
+    .listen(port, () => {
+      signale.info(`running site on http://localhost:${port} 🔄: NODE_ENV is ${nodeEnv ? nodeEnv : 'not set'}`)
+    })
+    .on('error', err => {
+      if (err.code === 'EADDRINUSE') {
+        signale.fatal(`port ${port} is already in use; is live-reload already running?`)
+        process.exit(1)
+      }
+      throw err
+    })
 }
 
-module.exports = launchStaticServer
+export default launchStaticServer

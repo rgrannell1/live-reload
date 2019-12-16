@@ -1,5 +1,5 @@
 
-const signale = require('signale')
+import * as signale from 'signale'
 
 const state = {
   previous: ''
@@ -26,6 +26,6 @@ const report = err => {
   }
 }
 
-module.exports = {
+export default {
   report
 }

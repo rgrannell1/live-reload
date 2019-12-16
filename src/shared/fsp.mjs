@@ -1,5 +1,5 @@
 
-const fs = require('fs')
+import * as fs from 'fs'
 
 const fsp = {}
 
@@ -19,4 +19,4 @@ fsp.stat = fpath => {
   })
 }
 
-module.exports = fsp
+export default fsp

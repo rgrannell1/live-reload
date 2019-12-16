@@ -1,10 +1,11 @@
 
-const path = require('path')
-const signale = require('signale')
-const koremutake = require('../shared/koremutake')
-const prepareIndexFile = require('./prepare-index-file')
+import * as path from 'path'
+import * as signale from 'signale'
+import koremutake from '../shared/koremutake'
+import prepareIndexFile from './prepare-index-file'
 
 const launch = {
+  apiServer: require('./launch-api-server'),
   staticServer: require('./launch-static-server'),
   wsServer: require('./launch-ws-server'),
   build: require('./launch-build')
@@ -57,6 +58,7 @@ const serveSite = async (state, args, pids) => {
   const contentChange = prepareIndexFile({
     pids,
     state,
+    watch: args.site.watch,
     site: args.site.path,
     publicFolder: args.site.publicFolder
   })
@@ -73,6 +75,10 @@ const serveSite = async (state, args, pids) => {
   })
 
   wss.on(events.message, handleBrowserMessages(state))
+}
+
+const serveApiServer = async (state, args, pids) => {
+  launch.apiServer(state, args.api.path, args.api.port)
 }
 
 /**
@@ -100,6 +106,10 @@ const liveReload = async args => {
   if (args.site) {
     await serveSite(state, args, pids)
   }
+
+  if (args.api) {
+    await serveApiServer(state, args, pids)
+  }
 }
 
 /**
@@ -118,4 +128,4 @@ const callApplication = async rawArgs => {
   await liveReload(args)
 }
 
-module.exports = callApplication
+export default callApplication

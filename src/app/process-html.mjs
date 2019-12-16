@@ -1,9 +1,9 @@
 
-const errors = require('@rgrannell/errors')
-const cheerio = require('cheerio')
-const signale = require('signale')
-const moment = require('moment')
-const fs = require('fs')
+import * as errors from '@rgrannell/errors'
+import * as cheerio from 'cheerio'
+import * as signale from 'signale'
+import * as moment from 'moment'
+import * as fs from 'fs'
 
 const constants = require('../shared/constants')
 
@@ -37,4 +37,4 @@ const processHtml = async (fpath, html, state) => {
   }
 }
 
-module.exports = processHtml
+export default processHtml

@@ -11,7 +11,7 @@ const phonemes = [
   'gry', 'pra', 'pre', 'pri', 'pro', 'pru', 'pry', 'sta', 'ste', 'sti', 'sto',
   'stu', 'sty', 'tra', 'tre']
 
-module.exports = () => {
+export default () => {
   const chars = []
 
   for (let ith = 0; ith < 8; ++ith) {

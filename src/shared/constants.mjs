@@ -1,7 +1,7 @@
 
-const path = require('path')
+import * as path from 'path'
 
-module.exports = {
+export default {
   codes: {
     LR_001: 'LR_001',
     LR_002: 'LR_002',

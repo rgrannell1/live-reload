@@ -1,10 +1,12 @@
 
-const fs = require('fs')
-const path = require('path')
-const errors = require('@rgrannell/errors')
-const constants = require('../shared/constants')
-const { codes } = require('../shared/constants')
-const jsonSchema = require('jsonschema').validate
+import * as fs from 'fs'
+import * as path from 'path'
+import * as errors from '@rgrannell/errors'
+import constants from '../shared/constants'
+import { codes } from '../shared/constants'
+import { validate } from 'jsonschema'
+
+const jsonSchema = validate
 
 const processArgs = {}
 
@@ -200,4 +202,4 @@ processArgs.package = packageJson => {
   return config
 }
 
-module.exports = processArgs
+export default processArgs

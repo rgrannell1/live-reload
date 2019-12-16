@@ -1,9 +1,9 @@
 
-const errors = require('@rgrannell/errors')
-const constants = require('../shared/constants')
+import * as errors from '@rgrannell/errors'
+import constants from '../shared/constants'
 
-const WebSocket = require('ws')
-const EventEmitter = require('events')
+import * as WebSocket from 'ws'
+import * as EventEmitter from 'events'
 
 const readEvent = data => {
   try {
@@ -37,4 +37,4 @@ const launchWsServer = async (state, port) => {
   return emitter
 }
 
-module.exports = launchWsServer
+export default launchWsServer

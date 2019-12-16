@@ -1,9 +1,9 @@
 
-const chalk = require('chalk')
-const cp = require('child_process')
-const stripAnsi = require('strip-ansi')
-const errors = require('@rgrannell/errors')
-const constants = require('../shared/constants')
+import * as chalk from 'chalk'
+import * as cp from 'child_process'
+import * as stripAnsi from 'strip-ansi'
+import * as errors from '@rgrannell/errors'
+import constants from '../shared/constants.js'
 const { codes } = constants
 
 const buildExit = {}
@@ -56,4 +56,4 @@ const launchBuild = (pids, hide, buildArg) => {
   pids.build = child
 }
 
-module.exports = launchBuild
+export default launchBuild

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "bin": {
-    "live-reload": "./src/cli/interface.js"
+    "live-reload": "./src/cli/interface.mjs"
   },
   "scripts": {
     "standard": "npx standard 'src/**'",

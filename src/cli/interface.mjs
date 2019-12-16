@@ -1,9 +1,13 @@
 #!/usr/bin/env node
 
-const { docopt } = require('docopt')
-const errUtils = require('../shared/errors')
-const constants = require('../shared/constants')
-const pkg = require('../../package.json')
+import docopt from 'docopt'
+
+import * as fs from 'fs'
+
+import errUtils from '../shared/errors'
+import constants from '../shared/constants'
+
+const pkg = JSON.parse(fs.readFileSync('../../package.json').toString())
 
 const doc = `
 Usage:
@@ -15,8 +19,6 @@ Author:
 Description:
   live-reload is a build-frameworld agnostic method of live-reloading a website when changes are made.
 
-Options:
-  --package should the package be used for configuration?
 `
 
 const liveReload = require('../app/live-reload')
