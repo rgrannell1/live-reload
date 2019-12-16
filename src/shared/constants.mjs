@@ -1,6 +1,8 @@
 
 import * as path from 'path'
 
+const _dirname = path.dirname(import.meta.url)
+
 export default {
   codes: {
     LR_001: 'LR_001',
@@ -24,7 +26,7 @@ export default {
     'client/html/index.html'
   ],
   paths: {
-    liveReload: path.resolve('../../static/live-reload.js')
+    liveReload: path.join(_dirname, '../../static/live-reload.js').replace('file:', '')
   },
   ports: {
     wss: 4001,

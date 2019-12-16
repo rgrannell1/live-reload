@@ -21,7 +21,7 @@ const launchApiServer = (state, fpath, port) => {
     serverPromise = Promise.resolve(require(fullPath))
   }
 
-  serverPromise.then(server => {
+  return serverPromise.then(server => {
     const nodeEnv = process.env.NODE_ENV
 
     server.default

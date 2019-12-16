@@ -1,8 +1,8 @@
 
-import * as chalk from 'chalk'
-import * as cp from 'child_process'
-import * as stripAnsi from 'strip-ansi'
-import * as errors from '@rgrannell/errors'
+import chalk from 'chalk'
+import cp from 'child_process'
+import stripAnsi from 'strip-ansi'
+import errors from '@rgrannell/errors'
 import constants from '../shared/constants.mjs'
 const { codes } = constants
 

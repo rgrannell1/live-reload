@@ -101,10 +101,6 @@ const readSiteOnChange = async ({ site, publicFolder, state }) => {
 }
 
 const prepareIndexFile = ({ state, watch, site, publicFolder }) => {
-  console.log(EventEmitter )
-  console.log(EventEmitter )
-  console.log(EventEmitter )
-  console.log(EventEmitter )
   const emitter = new EventEmitter()
 
   const { events } = constants

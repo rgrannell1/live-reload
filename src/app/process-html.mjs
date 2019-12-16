@@ -1,8 +1,8 @@
 
-import * as errors from '@rgrannell/errors'
-import * as cheerio from 'cheerio'
-import * as signale from 'signale'
-import * as moment from 'moment'
+import errors from '@rgrannell/errors'
+import cheerio from 'cheerio'
+import signale from 'signale'
+import moment from 'moment'
 import * as fs from 'fs'
 
 import constants from '../shared/constants'
