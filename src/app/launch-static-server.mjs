@@ -1,6 +1,7 @@
 
 import signale from 'signale'
 import express from 'express'
+import cors from 'cors'
 
 /**
  * Serve the index html to the user file.
@@ -25,6 +26,10 @@ const serveIndex = state => (req, res) => {
  */
 const launchStaticServer = async (state, publicDir, port) => {
   const app = express()
+
+  app.use(cors({
+    origin: true
+  }))
 
   app.get('/', serveIndex(state))
 
