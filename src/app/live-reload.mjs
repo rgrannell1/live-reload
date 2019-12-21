@@ -1,6 +1,7 @@
 
 import * as path from 'path'
-import * as signale from 'signale'
+import signale from 'signale'
+import dotenv from 'dotenv'
 import koremutake from '../shared/koremutake'
 import prepareIndexFile from './prepare-index-file'
 
@@ -58,14 +59,14 @@ eventHandlers.serviceWorkerDetectedAfterUnregister = (state, event) => {
 }
 
 const serveSite = async (state, args, pids) => {
-  launch.staticServer(state, args.site.publicFolder, args.site.ports.http)
+  launch.staticServer(state, args.site.publicDir, args.site.ports.http)
 
   const contentChange = prepareIndexFile({
     pids,
     state,
     watch: args.site.watch,
     site: args.site.path,
-    publicFolder: args.site.publicFolder
+    publicDir: args.site.publicDir
   })
 
   const wss = await launch.wsServer(state, args.site.ports.wss)
@@ -83,6 +84,10 @@ const serveSite = async (state, args, pids) => {
 }
 
 const serveApiServer = async (state, args, pids) => {
+  if (args.api && args.api.path) {
+    dotenv.config()
+  }
+
   launch.apiServer(state, args.api.path, args.api.port)
 }
 
