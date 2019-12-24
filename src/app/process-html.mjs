@@ -7,6 +7,14 @@ import * as fs from 'fs'
 
 import constants from '../shared/constants'
 
+/**
+ * Return a modified version of the user-provided site. This will
+ * include additional JavaScript content.
+ *
+ * @param fpath string the file-path of the site
+ * @param html string the loaded HTML
+ * @param state object the application state
+ */
 const processHtml = async (fpath, html, state) => {
   const code = await new Promise((resolve, reject) => {
     fs.readFile(constants.paths.liveReload, (err, res) => {

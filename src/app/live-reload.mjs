@@ -123,9 +123,11 @@ const liveReload = async args => {
 }
 
 /**
- * Run the live-reload applications
+ * Run the live-reload application
  *
  * @param {Object} rawArgs arguments provided by the docopt interface
+ *
+ * @returns {Promise<>} a result promise
  */
 const callApplication = async rawArgs => {
   let args;

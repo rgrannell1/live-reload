@@ -4,9 +4,11 @@ import express from 'express'
 import cors from 'cors'
 
 /**
- * Serve the index html to the user file.
+ * Serve the index html to the user.
  *
  * @param {Object} state the state object
+ *
+ * @returns {undefined}
  */
 const serveIndex = state => (req, res) => {
   const hasSource = state && state.siteData && state.siteData.content && state.siteData.content.source
@@ -19,10 +21,12 @@ const serveIndex = state => (req, res) => {
 }
 
 /**
- * launch the static-server
+ * launch a static express-server.
  *
  * @param {Object} state the application's state object
  * @param {number} port the port on which to run the static-server
+ *
+ * @returns {Express} an express server
  */
 const launchStaticServer = async (state, publicDir, port) => {
   const app = express()
@@ -37,7 +41,7 @@ const launchStaticServer = async (state, publicDir, port) => {
 
   const nodeEnv = process.env.NODE_ENV
 
-  app
+  return app
     .listen(port, () => {
       signale.info(`running site on http://localhost:${port} 🔄: NODE_ENV is ${nodeEnv ? nodeEnv : 'not set'}`)
     })
