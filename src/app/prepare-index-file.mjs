@@ -31,6 +31,11 @@ const readSiteStat = async ({ fullPath, site, publicDir }) => {
   }
 }
 
+/**
+ * Read the index.html file
+ *
+ * @param param.site {string}
+ */
 const readSite = async ({ site, fullPath, publicDir, state }) => {
   let refreshed = false
 
@@ -75,9 +80,13 @@ const hasSameEditTimes = (stat, previous) => {
 }
 
 /**
+ * Reload the site, if the file changed.
  *
+ * @param param0.site {string} the html site provided
+ * @param param0.publicDir {string} the public folder provided
+ * @param param0.state {object} the application state
  *
- * @param param0
+ * @returns {Object} the refreshed site and associated metadata
  */
 const readSiteOnChange = async ({ site, publicDir, state }) => {
   const fullPath = path.join(publicDir, site)
