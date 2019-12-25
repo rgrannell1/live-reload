@@ -1,3 +1,5 @@
+
+// Random phonemes
 const phonemes = [
   'ba', 'be', 'bi', 'bo', 'bu', 'by', 'da', 'de', 'di', 'do', 'du', 'dy', 'fa',
   'fe', 'fi', 'fo', 'fu', 'fy', 'ga', 'ge', 'gi', 'go', 'gu', 'gy', 'ha', 'he',
@@ -11,6 +13,11 @@ const phonemes = [
   'gry', 'pra', 'pre', 'pri', 'pro', 'pru', 'pry', 'sta', 'ste', 'sti', 'sto',
   'stu', 'sty', 'tra', 'tre']
 
+/**
+ * Generate a random readable string
+ *
+ * @returns {string} random koremutake strings
+ */
 export default () => {
   const chars = []
 

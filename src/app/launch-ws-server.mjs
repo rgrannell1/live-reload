@@ -5,6 +5,13 @@ import constants from '../shared/constants'
 import WebSocket from 'ws'
 import EventEmitter from 'events'
 
+/**
+ * Parse a WebSocket event
+ *
+ * @param {Object} data
+ *
+ * @returns {Object} event-data
+ */
 const readEvent = data => {
   try {
     return JSON.parse(data)
@@ -18,6 +25,8 @@ const readEvent = data => {
  *
  * @param {Object} state the state object
  * @param {number} port the websocket port
+ *
+ * @returns {EventEmitter}
  */
 const launchWsServer = async (state, port) => {
   const wss = new WebSocket.Server({ port })

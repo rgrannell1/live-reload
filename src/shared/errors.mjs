@@ -5,6 +5,13 @@ const state = {
   previous: ''
 }
 
+/**
+ * Report an errors captured by the application
+ *
+ * @param err {Error} an error captured
+ *
+ * @returns {undefined}
+ */
 const report = err => {
   if (!err.code) {
     throw err

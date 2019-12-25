@@ -11,6 +11,10 @@ const buildExit = {}
 /**
  * Display a build-exception.
  *
+ * @param {code} number an exit code
+ * @param {signal}
+ *
+ * @throws buildError
  */
 buildExit.error = (code, signal) => {
   throw errors.buildError(`build process exited with ${code} status.`, codes.LR_004)
@@ -18,6 +22,8 @@ buildExit.error = (code, signal) => {
 /**
  *
  * Display that a build terminated
+ *
+ * @throws buildExit
  *
  */
 buildExit.success = () => {
@@ -29,6 +35,7 @@ buildExit.success = () => {
  *
  * @param {Object} pids
  * @param {string} buildArg
+ *
  */
 const launchBuild = (pids, hide, buildArg) => {
   const child = cp.spawn(buildArg, {

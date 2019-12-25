@@ -21,6 +21,13 @@ import constants from '../shared/constants'
 import errUtils from '../shared/errors'
 import processArgs from '../cli/process-args'
 
+/**
+ * Stringify JSON data
+ *
+ * @param data {Object} JSON data
+ *
+ * @returns {string}
+ */
 const asEvent = data => {
   return JSON.stringify(data)
 }
@@ -29,6 +36,9 @@ process.on('unhandledRejection', errUtils.report)
 
 const eventHandlers = {}
 
+/**
+ *
+ */
 eventHandlers.connectionOpen = (state, event) => {
   if (state.session !== event.session) {
     signale.warn(`expected connection from session ${state.session} but received from session ${event.session}`)
