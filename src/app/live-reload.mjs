@@ -2,13 +2,13 @@
 import * as path from 'path'
 import signale from 'signale'
 import dotenv from 'dotenv'
-import koremutake from '../shared/koremutake'
-import prepareIndexFile from './prepare-index-file'
+import koremutake from '../shared/koremutake.mjs'
+import prepareIndexFile from './prepare-index-file.mjs'
 
-import apiServer from './launch-api-server'
-import staticServer from './launch-static-server'
-import wsServer from './launch-ws-server'
-import build from './launch-build'
+import apiServer from './launch-api-server.mjs'
+import staticServer from './launch-static-server.mjs'
+import wsServer from './launch-ws-server.mjs'
+import build from './launch-build.mjs'
 
 const launch = {
   apiServer,
@@ -17,9 +17,9 @@ const launch = {
   build
 }
 
-import constants from '../shared/constants'
-import errUtils from '../shared/errors'
-import processArgs from '../cli/process-args'
+import constants from '../shared/constants.mjs'
+import errUtils from '../shared/errors.mjs'
+import processArgs from '../cli/process-args.mjs'
 
 /**
  * Stringify JSON data
@@ -37,6 +37,10 @@ process.on('unhandledRejection', errUtils.report)
 const eventHandlers = {}
 
 /**
+ * Handle a websockect connection-opened event
+ *
+ * @param {Object} state the application state
+ * @param {Object} event a connection event
  *
  */
 eventHandlers.connectionOpen = (state, event) => {
@@ -125,7 +129,10 @@ const liveReload = async args => {
 
   if (args.site) {
     await serveSite(state, args, pids)
-  }
+  }/**
+ *
+ */
+
 
   if (args.api) {
     await serveApiServer(state, args, pids)

@@ -4,9 +4,9 @@ import chokidar from 'chokidar'
 import EventEmitter from 'events'
 import errors from '@rgrannell/errors'
 
-import fsp from '../shared/fsp'
-import processHtml from './process-html'
-import constants from '../shared/constants'
+import fsp from '../shared/fsp.mjs'
+import processHtml from './process-html.mjs'
+import constants from '../shared/constants.mjs'
 const { codes } = constants
 
 /**

@@ -1,6 +1,6 @@
 
 import * as errors from '@rgrannell/errors'
-import constants from '../shared/constants'
+import constants from '../shared/constants.mjs'
 
 import WebSocket from 'ws'
 import EventEmitter from 'events'

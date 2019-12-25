@@ -1,6 +1,6 @@
 
 import errors from '@rgrannell/errors'
-import constants from '../shared/constants'
+import constants from '../shared/constants.mjs'
 const { codes } = constants
 import jsonSchema from 'jsonschema'
 

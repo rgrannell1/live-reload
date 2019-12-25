@@ -5,7 +5,7 @@ import signale from 'signale'
 import moment from 'moment'
 import * as fs from 'fs'
 
-import constants from '../shared/constants'
+import constants from '../shared/constants.mjs'
 
 /**
  * Return a modified version of the user-provided site. This will

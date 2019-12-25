@@ -5,8 +5,8 @@ import docopt from 'docopt'
 import * as fs from 'fs'
 import * as path from 'path'
 
-import errUtils from '../shared/errors'
-import liveReload from '../app/live-reload'
+import errUtils from '../shared/errors.mjs'
+import liveReload from '../app/live-reload.mjs'
 
 const packageLocation = path.resolve('./package.json')
 
