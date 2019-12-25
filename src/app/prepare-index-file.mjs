@@ -60,6 +60,8 @@ const readSite = async ({ site, fullPath, publicDir, state }) => {
  *
  * @param {Object} stat stats for the index file
  * @param {Object | undefined} previous stats for the previously loaded file
+ *
+ * @returns {boolean} whether the index file
  */
 const hasSameEditTimes = (stat, previous) => {
   if (!previous) {
@@ -72,6 +74,11 @@ const hasSameEditTimes = (stat, previous) => {
   return hasSameCtime && hasSameMtime
 }
 
+/**
+ *
+ *
+ * @param param0
+ */
 const readSiteOnChange = async ({ site, publicDir, state }) => {
   const fullPath = path.join(publicDir, site)
 
@@ -100,6 +107,15 @@ const readSiteOnChange = async ({ site, publicDir, state }) => {
   }
 }
 
+/**
+ * Prepare and serve the user's site
+ *
+ * @param config.state {Object} the application state
+ * @param config.watch {Array<string>} the command to watch
+ * @param config.site {string} the html site to prepare
+ *
+ * @returns {EventEmitter}
+ */
 const prepareIndexFile = ({ state, watch, site, publicDir }) => {
   const emitter = new EventEmitter()
 

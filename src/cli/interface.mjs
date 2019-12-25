@@ -6,7 +6,6 @@ import * as fs from 'fs'
 import * as path from 'path'
 
 import errUtils from '../shared/errors'
-import constants from '../shared/constants'
 import liveReload from '../app/live-reload'
 
 const packageLocation = path.resolve('./package.json')
@@ -32,17 +31,17 @@ Configuration:
     "live-reload": ...
   }
 
-  live-reload.build             an array of persistant build commands to launch (e.g ["webpack --watch"]). live-reload will relaunch the static-file & api server if these builds update watched files. If this option is ommited, the static-file & api-servers simply relaunch when you type changes into watched file.
+  live-reload.build            an array of persistant build commands to launch (e.g ["webpack --watch"]). live-reload will relaunch the static-file & api server if these builds update watched files. If this option is ommited, the static-file & api-servers simply relaunch when you type changes into watched file.
 
-  live-reload.site              contains configuration describing how to launch and manage a static-file server for launching your site.
+  live-reload.site             contains configuration describing how to launch and manage a static-file server for launching your site.
 
-  live-reload.site.path         the path to your site (e.g public/index.html).
+  live-reload.site.path        the path to your site (e.g public/index.html).
 
-  live-reload.site.publicDir    a public directory to serve files from (e.g public, client). This folder typically includes html, css, and js subdirectories.
+  live-reload.site.publicDir   a public directory to serve files from (e.g public, client). This folder typically includes html, css, and js subdirectories.
 
   live-reload.site.watch       an array of directories to watch for changes. If files within these directories change, the static-site will reload.
 
-  live-reload.site.port         what port should the static-server run on?
+  live-reload.site.port        what port should the static-server run on?
 
   live-reload.api              contains configuration describing how to launch and manage an api server for launching
   live-reload.api.path         the path to the API server. Expected to be a .mjs module that exports a non-listening express-server.
