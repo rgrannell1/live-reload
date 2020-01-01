@@ -130,6 +130,10 @@ const packageSchema = {
  * @returns {Object} configuration
  */
 processArgs.package = packageJson => {
+  if (!packageJson) {
+    throw errors.missingConfig('package.json not successfully loaded', codes.MISSING_CONFIG)
+  }
+
   if (!packageJson['live-reload']) {
     throw errors.missingConfig('no "live-reload" configuration found in package.json', codes.MISSING_CONFIG)
   }

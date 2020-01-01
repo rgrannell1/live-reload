@@ -1,4 +1,5 @@
 
+import * as fs from 'fs'
 import * as path from 'path'
 import signale from 'signale'
 import dotenv from 'dotenv'
@@ -56,6 +57,11 @@ eventHandlers.connectionOpen = (state, event) => {
   }
 }
 
+/**
+ * Dispatch any .
+ *
+ * @param {Object} state the application state
+ */
 const handleBrowserMessages = state => event => {
   if (eventHandlers.hasOwnProperty(event.tag)) {
     eventHandlers[event.tag](state, event)
@@ -72,6 +78,15 @@ eventHandlers.serviceWorkerDetectedAfterUnregister = (state, event) => {
   signale.warn('failed to unregister service-workers')
 }
 
+/**
+ * Serve any static files
+ *
+ * @param {Object} state the application state
+ * @param {Object} args arguments provided to the application
+ * @param {Object} pids subprocess pids
+ *
+ * @returns {Promise<>}
+ */
 const serveSite = async (state, args, pids) => {
   launch.staticServer(state, args.site.publicDir, args.site.ports.http)
 
@@ -97,6 +112,15 @@ const serveSite = async (state, args, pids) => {
   wss.on(events.message, handleBrowserMessages(state))
 }
 
+/**
+ * Start the API server.
+ *
+ * @param {Object} state the application state
+ * @param {Object} args arguments provided to the application
+ * @param {Object} pids subprocess pids
+ *
+ * @returns {Promise<>}
+ */
 const serveApiServer = async (state, args, pids) => {
   if (args.api && args.api.path) {
     dotenv.config()
@@ -109,6 +133,8 @@ const serveApiServer = async (state, args, pids) => {
  * Run live-reload with processed arguments.
  *
  * @param {Object} args arguments supplied to live-reload after processing.
+ *
+ * @returns {Promise<>} a result promise
  */
 const liveReload = async args => {
   const pids = {}
@@ -129,10 +155,7 @@ const liveReload = async args => {
 
   if (args.site) {
     await serveSite(state, args, pids)
-  }/**
- *
- */
-
+  }
 
   if (args.api) {
     await serveApiServer(state, args, pids)
@@ -151,11 +174,10 @@ const callApplication = async rawArgs => {
 
   if (rawArgs['--package']) {
     const packageLocation = path.join(process.cwd(), './package.json')
-    return import(packageLocation).then(packageJson => {
 
-      args = processArgs.package(packageJson.default)
-      return liveReload(args)
-    })
+    const packageJson = JSON.parse(fs.readFileSync(packageLocation).toString())
+    args = processArgs.package(packageJson)
+    return liveReload(args)
   }
 
   await liveReload(args)
