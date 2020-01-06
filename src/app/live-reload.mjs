@@ -1,6 +1,7 @@
 
 import * as fs from 'fs'
 import * as path from 'path'
+import chokidar from 'chokidar'
 import signale from 'signale'
 import dotenv from 'dotenv'
 import koremutake from '../shared/koremutake.mjs'
@@ -126,7 +127,20 @@ const serveApiServer = async (state, args, pids) => {
     dotenv.config()
   }
 
-  launch.apiServer(state, args.api.path, args.api.port)
+  const watcher = chokidar.watch(args.api.watch, {
+    persistent: true
+  })
+
+  let server
+
+  watcher.on('all', async (event, fpath) => {
+    if (server) {
+      server.close()
+    }
+
+    server = await launch.apiServer(state, args.api.path, args.api.port)
+  })
+
 }
 
 /**
