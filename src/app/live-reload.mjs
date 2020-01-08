@@ -113,6 +113,14 @@ const serveSite = async (state, args, pids) => {
   wss.on(events.message, handleBrowserMessages(state))
 }
 
+const timer = num => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve()
+    }, num)
+  })
+}
+
 /**
  * Start the API server.
  *
@@ -131,16 +139,29 @@ const serveApiServer = async (state, args, pids) => {
     persistent: true
   })
 
-  let server
+  let time
 
   watcher.on('all', async (event, fpath) => {
-    if (server) {
-      server.close()
-    }
-
-    server = await launch.apiServer(state, args.api.path, args.api.port)
+    time = Date.now()
   })
 
+  let running
+  let server
+
+  setInterval(async () => {
+    if (!running || time !== running) {
+      if (server && server.close) {
+        server.close()
+      }
+
+      try {
+        server = await launch.apiServer(state, args.api.path, args.api.port)
+      } catch (err) {
+        console.log(err)
+        console.log('~~~~~~~~~')
+      }
+    }
+  }, 250)
 }
 
 /**

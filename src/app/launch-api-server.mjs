@@ -2,6 +2,7 @@
 import chokidar from 'chokidar'
 import signale from 'signale'
 import * as path from 'path'
+import { rejects } from 'assert'
 
 /**
  * Launch an API server.
@@ -25,17 +26,20 @@ const launchApiServer = (state, fpath, port) => {
   return serverPromise.then(server => {
     const nodeEnv = process.env.NODE_ENV
 
-    server.default
-      .listen(port, () => {
-        signale.info(`running API on http://localhost:${port} 🔄: NODE_ENV is ${nodeEnv ? nodeEnv : 'not set'}`)
-      })
-      .on('error', err => {
-        if (err.code === 'EADDRINUSE') {
-          signale.fatal(`port ${port} is already in use; is live-reload already running?`)
-          process.exit(1)
-        }
-        throw err
-      })
+    return new Promise((resolve, reject) => {
+      server.default
+        .listen(port, () => {
+          signale.info(`running API on http://localhost:${port} 🔄: NODE_ENV is ${nodeEnv ? nodeEnv : 'not set'}`)
+          resolve(server)
+        })
+        .on('error', err => {
+          if (err.code === 'EADDRINUSE') {
+            signale.fatal(`port ${port} is already in use; is live-reload already running?`)
+            reject(new Error('port in use'))
+          }
+          reject(err)
+        })
+    })
   })
 }
 
